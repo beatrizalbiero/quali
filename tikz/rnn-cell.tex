@@ -1,0 +1,14 @@
+\begin{tikzpicture}[auto]
+
+% operations
+\node[deterministic, minimum size=25pt] (h) {$\textbf{h}_{t}$};
+\node[deterministic, minimum size=25pt, below=20pt of h] (x) {$\textbf{x}_{t}$};
+\node[deterministic, minimum size=25pt, above=20pt of h] (y) {$\mathbf{\hat{y}}_{t}$};
+
+% edges
+\path[pedge] (x) edge node[midway] {$\theta_{xh}$} (h);
+\path[pedge] (h) edge node[midway] {$\theta_{hy}$} (y);
+\path[pedge] (h) edge [loop right] node [midway] {$\theta_{hh}$} (h);
+
+\label{fig:rnn-cell}
+\end{tikzpicture}

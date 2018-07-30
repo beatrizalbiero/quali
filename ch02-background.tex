@@ -1,0 +1,348 @@
+\chapter{Background}
+\label{ch:02-background}
+
+We can make human language manageable to computers by using a sort of different methods and techniques. This is the bread and butter of any NLP researcher. Here, following the NLP community, we will focus only in the techniques derived from the machine learning field. In this chapter, we will present some abstract machine learning models follow by some applications in NLP. 
+
+\section{Machine Learning}
+
+\textit{Machine learning} is the branch of computer science that deals with programs that can improve with experience (i. e., learn). Machine learning is divided into three main subareas: \textit{supervised learning}, \textit{reinforcement learning} and \textit{unsupervised learning}.
+
+We will work with supervised learning only. In this setting, we assume that the process of interest is defined by an unknown function $g:X\rightarrow Y$. We try to approximate $g$ by changing the parameters of a function $f$ through an optimization process. The optimization is done by defining an \textit{error function} that evaluates how well $f$ approximates $g$ in the part of $g$ that we have access: the training data $D = \{(\vect{x}^{(1)}, \vect{y}^{(1)}), \dots ,(\vect{x}^{(N)}, \vect{y}^{(N)})\}$ (where $g(\vect{x}^{(i)})=\vect{y}^{(i)}$).
+
+
+$f$ can be a function from any family of models. One family that is having a lot of success for language tasks is the \textit{neural network} family.
+
+\section{Neural Networks}
+
+A neural network is a non-linear function $f(\vect{x}; \vect{\theta})$. It is defined by a collection of parameters $\vect{\theta}$ and a collection of non-linear transformations. It is usual to represent $f$ as a compositions of functions:
+
+\begin{align}
+f(\vect{x}; \vect{\theta}) &= f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1); \vect{W}_2, \vect{b}_2)\\
+&= softmax(\vect{W}_2 (\sigma(\vect{W}_1\vect{x} + \vect{b}_1)) + \vect{b}_2)
+\end{align}
+
+
+The output of these intermediary functions are referred as \textit{layers}. So in the example above, $\vect{x}$ (the output of the identity function) is the \textit{input layer}, $f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1)$ is the \textit{hidden layer} and $f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1); \vect{W}_2, \vect{b}_2)$ is the \textit{output layer}. Since each layer is a vector, we normally speak about the \textit{dimension} of a layer. For historical reasons we also say that each entry on a layer is a \textit{node} or a \textit{neuron}.  Models with a large number of hidden layers are called \textit{deep models}, for this reason the name \textit{deep learning} is used.  
+
+\par A neural network is a function approximator: it can approximate any Borel measurable function from one finite dimensional space to another with any desired nonzero amount of error. This theoretical result is know as the \textit{universal approximation theorem} \cite{Cybenko}. Without entering in the theoretical concepts, it suffice to note that the family of Borel mensurable functions include all continuous functions on a closed and bounded subset of $\mathbb{R}^n$.
+
+
+
+Different deep learning architectures are used in NLP: \textit{convolutional architectures} have a good performance in tasks were it is required to find a linguistic indicator regardless of its position (e.g., document classification, short-text categorization, sentiment classification, etc); high quality word embeddings can be achieved with models that are a kind of \textit{feedforward neural network} \cite{Mikolov23}. But for a variety of works in natural language we want to capture regularities and similarities in a text structure. That is way \textit{recurrent} and \textit{recursive} models have been widely used in the field. Here we are focused on generative models and since recurrent models have been producing very strong results for language modeling \cite{goldberg15}, we will concentrate on them.
+
+
+\section{Recurrent Neural Network}
+\label{sec:RNN}
+
+
+\textit{Recurrent neural network} (RNN) is a family of neural network specialized in sequential data $\vect{x}^{(1)}, \dots, \vect{x}^{(\tau)}$. As a neural network, a RNN is a parametrized function that we use to approximate one hidden function from the data. What makes RNN unique is a recurrent definition of one of its hidden layer:
+
+\begin{equation}
+\vect{h}^{(t)} = g(\vect{h}^{(t-1)}, \vect{x}^{(t)}; \vect{\theta})
+\end{equation}
+
+$\vect{h}^{(t)}$ is called \textit{state}, \textit{hidden state}, or \textit{cell}.
+
+
+\par This recurrent equation can be unfolded for a finite number of steps $\tau$. For example, when $\tau =3$:
+
+\begin{align}
+\vect{h}^{(3)}& = g(\vect{h}^{(2)}, \vect{x}^{(3)}; \vect{\theta})\\
+ & = g(g(\vect{h}^{(1)}, \vect{x}^{(2)}; \vect{\theta}), \vect{x}^{(3)}; \vect{\theta})\\
+ & = g(g(g(\vect{h}^{(0)}, \vect{x}^{(1)}; \vect{\theta}), \vect{x}^{(2)}; \vect{\theta}), \vect{x}^{(3)}; \vect{\theta})\\
+\end{align}
+
+Using a concrete example consider the following classification model define by the equations:
+
+\begin{equation}
+f(\vect{x}^{(t)}, \vect{h}^{(t-1)}; \vect{V}, \vect{W}, \vect{U}, \vect{c}, \vect{b}) = \vect{\hat{y}}^{(t)}
+\end{equation}
+ \vspace{0.2cm}
+\begin{equation}
+\vect{\hat{y}}^{(t)} = softmax(\vect{V} \vect{h}^{(t)} + \vect{c})
+\end{equation}
+\vspace{0.2cm}
+ \begin{equation}
+\vect{h}^{(t)} = g(\vect{h}^{(t-1)}, \vect{x}^{(t)}; \vect{W},\vect{U}, \vect{b})
+\end{equation}
+\vspace{0.2cm}
+\begin{equation}
+\vect{h}^{(t)} = \sigma(\vect{W} \vect{h}^{(t-1)} + \vect{U} \vect{x}^{(t)} + \vect{b})
+\end{equation}
+
+
+This kind of model can create an output $\vect{\hat{y}}^{(t)}$ at each time $t$, or the model can produce a single output $\vect{\hat{y}}$ after processing an entire input sequence. This choice depends on the learning problem that is being modeled.
+
+
+With the model's prediction at hand, we can use a loss function (like cross entropy for the classification problem) and apply the back-propagation algorithm to optimize the model. These models look complex, but it quite straightforward to compute the gradients \cite[p.~374]{DeepLearningbook}.
+
+Although this kind of deep learning model is very useful, it presents a severe flaw. When computing the gradients there is a lot of repeated matrix multiplication using the recurrent weight matrix (in the example above, the matrix $\vect{W}$). Depending on some configurations of this matrix \textit{the gradients may vanish or explode exponentially with respect to the number of time steps}.
+
+Thus, handing long-term dependencies became a problem when using RNNs. Different solutions were proposed, the most effective results came from some modifications of this model. We will present the two most famous modifications: \textit{the gated recurrent unit} and \textit{the long short-term memory}. 
+
+
+\section{Gated Recurrent Unit}
+\label{sec:GRU}
+
+To capture long-term dependencies on a RNN  the authors of the paper \cite{ChungGCB14}  proposed a new architecture called \textit{gated recurrent unit} (GRU). This model was constructed to make each hidden state  $\vect{h}^{(t)}$ to adaptively capture dependencies of different time steps. It work as follows, at each step $t$ one candidate for hidden state is formed:
+
+\begin{equation}
+\vect{\widetilde{h}}^{(t)} = tahn(\vect{W} (\vect{h}^{(t-1)} \odot  \vect{r}^{(t)}) + \vect{U} \vect{x}^{(t)} + \vect{b})
+\end{equation}
+
+where $\vect{r}^{(t)}$ is a vector with values in $[0, 1]$ called a \textit{reset gate}, i.e.,  a vector that at each entry outputs the probability of reseting the  corresponding entry in the previous hidden state $\vect{h}^{(t-1)}$. Together with $\vect{r}^{(t)}$ we define an \textit{update gate}, $\vect{u}^{(t)}$. It is also a vector with values in $[0, 1]$. Intuitively we can say that this vector decides how much on each dimension we will use the candidate update. Both $\vect{r}^{(t)}$ and $\vect{u}^{(t)}$ are defined by $\vect{h}^{(t-1)}$ and $\vect{x}^{(t)}$; they also have specific parameters:
+
+\begin{equation}
+\vect{r}^{(t)} = \sigma(\vect{W}_{r} \vect{h}^{(t-1)} + \vect{U}_{r} \vect{x}^{(t)} + \vect{b}_{r})
+\end{equation}
+
+
+\begin{equation}
+\vect{u}^{(t)} = \sigma(\vect{W}_{u} \vect{h}^{(t-1)} + \vect{U}_{u} \vect{x}^{(t)} + \vect{b}_{u})
+\end{equation}
+
+At the end the new hidden state $\vect{h}^{(t)}$ is defined by the recurrence:
+
+\begin{equation}
+\vect{h}^{(t)} = \vect{u}^{(t)} \odot \vect{\widetilde{h}}^{(t)} + (1 - \vect{u}^{(t)}) \odot \vect{h}^{(t-1)} 
+\end{equation}
+
+Note that the new hidden state combines the candidate hidden state $\vect{\widetilde{h}}^{(t)}$ with the past hidden state $\vect{h}^{(t-1)}$ using both $\vect{r}^{(t)}$ and $\vect{u}^{(t)}$ to adaptively copy and forget information.
+
+\section{Long Short-Term Memory}
+\label{sec:LSTM}
+
+\textit{Long short-term memory} (LSTM) is one of the most applied versions of the RNN family of models. Historically it was developed before the GRU model, but conceptually we can think in the LSTM as an expansion of the model presented in the last session. Because of notation differences they can look different. LSTM is also based on parametrized gates; in this case three: the \textit{forget gate}, $\vect{f}^{(t)}$, the \textit{input gate}, $\vect{i}^{(t)}$, and the \textit{output gate}, $\vect{o}^{(t)}$. The gates are defined only by $\vect{h}^{(t-1)}$ and $\vect{x}^{(t)}$ with specific parameters:
+
+
+\begin{equation}
+\vect{f}^{(t)} = \sigma(\vect{W}_{f} \vect{h}^{(t-1)} + \vect{U}_{f} \vect{x}^{(t)} + \vect{b}_{f})
+\end{equation}
+
+\begin{equation}
+\vect{i}^{(t)} = \sigma(\vect{W}_{i} \vect{h}^{(t-1)} + \vect{U}_{i} \vect{x}^{(t)} + \vect{b}_{i})
+\end{equation}
+
+\begin{equation}
+\vect{o}^{(t)} = \sigma(\vect{W}_{o} \vect{h}^{(t-1)} + \vect{U}_{o} \vect{x}^{(t)} + \vect{b}_{o})
+\end{equation}
+
+Intuitively $\vect{f}^{(t)}$ should control how much informative will be discarded, $\vect{i}^{(t)}$ controls how much information will be updated, and $\vect{o}^{(t)}$ controls how munch each component should be outputted. A candidate cell, $\tilde{\vect{c}}^{(t)}$ is formed:
+
+\begin{equation}
+\tilde{\vect{c}}^{(t)} = tahn(\vect{W} \vect{h}^{(t-1)} + \vect{U} \vect{x}^{(t)} + \vect{b})
+\end{equation}
+
+And a new cell $\vect{c}^{(t)}$ is formed by forgetting some information of the previous cell $\tilde{\vect{c}}^{(t-1)}$ and by adding new values from $\tilde{\vect{c}}^{(t)}$ (scaled by the input gate)
+
+\begin{equation}
+\vect{c}^{(t)} = \vect{f}^{(t)} \odot \vect{c}^{(t-1)} + \vect{i}^{(t)} \odot \tilde{\vect{c}}^{(t)}
+\end{equation}
+
+The new hidden state, $\vect{h}^{(t)}$, is formed by filtering $\vect{c}^{(t)}$:
+
+\begin{equation}
+\vect{h}^{(t)} = \vect{o}^{(t)} \odot tanh(\vect{c}^{(t)})
+\end{equation}
+
+Until now we have presented general deep learning theory, now we will focus on the specificities of these models applied to natural language problems.
+
+
+\section{Language model}
+
+We call \textit{language model} a probability distribution over sequences of tokens in a natural language.
+
+\[
+P(x_1,x_2,x_3,x_4) = p
+\]
+
+This model is used for different NLP tasks such as speech recognition, machine translation, text auto-completion, spell correction, question answering, summarization and many others.
+
+The classical approach to a language model was to use the chain rule of probability and a Markovian assumption, i.e., for a specific $n$ we assume that:
+
+\begin{equation}
+P(x_1, \dots, x_T) = \prod_{t=1}^{T} P(x_t \vert x_1, \dots, x_{t-1}) = \prod_{t=1}^{T} P(x_{t} \vert x_{t - (n+1)}, \dots, x_{t-1})
+\end{equation} 
+
+
+This gave raise to models based on $n$-gram statistics. The choice of $n$ yields different models; for example, the 
+\textit{unigram} language model ($n=1$) is defined as: 
+\begin{equation}
+P_{uni}(x_1, x_2, x_3, x_4) = P(x_1)P(x_2)P(x_3)P(x_4)
+\end{equation}
+
+where $P(x_i) = count(x_i)$ and $count$ is a function that counts tokens occurrence in a corpus.\\
+
+Similarly the \textit{bigram} language model ($n=2$) is defined as: 
+\begin{equation}
+P_{bi}(x_1,x_2,x_3,x_4) = P(x_1)P(x_2\vert x_1)P(x_3\vert x_2)P(x_4\vert x_3)
+\end{equation} 
+where
+\begin{equation}
+P(x_i\vert x_j) = \frac{count(x_i, x_j)}{count(x_j)}
+\end{equation} 
+
+With these basic statistics we can already define useful language models. It is observed that higher $n$-grams yields better performance. This comes with a price though, higher $n$-grams requires great amounts of memory \cite{Heafield}. For this motive $n$-grams based language models that are trained on large corpora uses at most $5$-grams. 
+
+Since \cite{Mikolov11} the landscape has change, instead of using one approach that is specific for the language domain, we can use a general model for sequential data prediction, a RNN. The RNN's ability to deal with unrestricted size sequence input permits to abandon the $n$-gram model's restricted context assumption.
+
+To understand the language model task as a machine learning task, some details should be clear. 
+
+First, the learning task is to estimate the probability distribution 
+
+\begin{equation}
+\label{languagedistri}
+P(x_{n} = \text{word}_{j^{*}} | x_{1}, \dots ,x_{n-1})
+\end{equation}
+
+for any $(n-1)$-sequence of words $x_{1}, \dots ,x_{n-1}$.
+
+
+Second, the function $f$ being used to approximate \ref{languagedistri} is trained on a corpus in the following way: each word $x_t$ of the corpus will be used as input to $f$ (in the form of an one-hot vector), and the immediate subsequent word, say $x_{t+1}$, will be used as a target. The training is done by minimizing the cross entropy loss between the model's output and the probability distribution given by the target.
+
+One example is in order. Suppose our corpus $\corpus$ is compose only by the lines below:
+
+\begin{quote}
+Yes, here we go again, give you more, nothing lesser\\
+Back on the mic is the anti-depressor\\
+Ad-Rock, the pressure, yes, we need this\\
+The best is yet to come, and yes, believe this\\
+\end{quote}
+
+
+From this corpus we can construct a vocabulary list $\Vocab$ as follows: after preprocessing the text we create a list of the most frequent words (in this case we can take all words) with the size $V$ (here $V=27$). Hence, we can treat each word in the text either by an index referring to the word position on $\Vocab$ or as a one-hot vector that codifies this index (e.g., "the" would be identified with $0$, "yes" with $1$, "we" with $2$, and so on).
+
+Then, the dataset is the collection of words 
+\[
+D = \{(<eos>, \text{Yes}), (\text{Yes}, \text{here}), (\text{here}, \text{we}),\dots,(\text{believe}, \text{this}), (\text{this}, <eos>)\}
+\]
+where $<eos>$ is the "end of sentence" token (also a member of $\Vocab$).
+
+A simple recurrent language model $f(\vect{x}^{(t)}, \vect{\theta})$ is defined by the following equations:
+
+\begin{equation}
+\vect{e}^{(t)} = \vect{E}\vect{x}^{(t)}
+\end{equation}
+\vspace{0.2cm}
+\begin{equation}
+\vect{h}^{(t)} = \sigma(\vect{W}\vect{h}^{(t-1)}+ \vect{U}\vect{e}^{(t)}+ \vect{b})
+\end{equation}
+\vspace{0.2cm}
+\begin{equation}
+f(\vect{x}^{(t)}, \vect{\theta}) = \vect{\hat{y}}^{(t)} = softmax(\vect{V}\vect{h}^{(t)} + \vect{c})
+\end{equation}
+
+where $\vect{E} \in \mathbb{R}^{d,V}$ is the matrix of word embeddings, $\vect{x}^{(t)} \in \mathbb{R}^{V}$ is one-hot word vector at time step $t$, $\vect{y}^{(t)} \in \mathbb{R}^{V}$ is the ground truth at time step $t$ (also a one-hot word vector) and $d$ is the size of the word embeddings.
+
+For each word $x_t$ let $j_t$ be the index of the subsequent word, so at each time $t$ the point-wise loss is:
+
+\begin{align}
+\label{lossCE}
+L^{(t)}(\vect{\theta}) &= CrossEntropy(\vect{y}^{(t)},\vect{\hat{y}}^{(t)})\\
+    &= - \log({\vect{\hat{y}}^{(t)}}_{j_t})\\
+        &= - \log P(x_{t+1} = \text{word}_{j_t}|x_{1}, \dots, x_{t})\\
+        &= - \log P(x_{t+1}|x_{1}, \dots, x_{t})
+\end{align}
+
+The loss $L$ is the mean of all point-wise losses
+
+\begin{equation}
+L(\vect{\theta})=\frac{1}{T}\sum_{t=1}^{T}L^{(t)}(\vect{\theta})
+\end{equation}
+
+With the loss function defined, we apply some optimization algorithm like \textit{stochastic gradient descent} to choose the optimal parameters for the language model:
+
+\begin{equation}
+\vect{\theta}^{*} = \argmin_{\vect{\theta}} L(\vect{\theta})
+\end{equation}
+
+Because of the historical connections with information theory, the \textit{perplexity} ($PP$) metric is often used to evaluate a language model. This metric can be thought as the weighted average branching factor of a language.
+
+Given $\corpus = x_1, x_2, \dots, x_T$, we define the perplexity of $\corpus$ ($PP(\corpus)$) as:
+
+\begin{align}
+PP(\corpus) &= P(x_1, x_2, \dots, x_T)^{-\frac{1}{T}}\\
+      &= \sqrt[T]{\frac{1}{P(x_1, x_2, \dots, x_T)}}\\
+      &= \sqrt[T]{\prod_{i=1}^{T}\frac{1}{P(x_i \vert x_1,\dots, x_{i-1})}}
+\end{align}
+
+Using \ref{lossCE} we can relate cross entropy loss and perplexity:
+
+\begin{align}
+        L(\vect{\theta}) &=\frac{1}{T} \sum_{t=1}^{T} L^{(t)}(\vect{\theta})\\
+          &=\frac{1}{T} \sum_{t=1}^{T} - \log P(x_{t+1}|x_{1}, \dots, x_{t})\\
+          &=\frac{1}{T} \sum_{t=1}^{T} \log ((\frac{1}{P(x_{t+1}|x_{1}, \dots, x_{t})})\\
+          &= \log\left( \sqrt[T]{\prod_{i=1}^{T}\frac{1}{P(x_i \vert x_1,\dots, x_{i-1})}} \right)\\
+          &= \log(PP(\corpus))
+\end{align}
+
+Hence,
+
+\begin{equation}
+2^{L(\vect{\theta})} = PP(\corpus)
+\end{equation}
+
+Thus, by finding the parameters that minimize the cross entropy error we are also minimizing the perplexity of the language model. 
+
+\section{Sequence-to-Sequence}
+\label{sec:Seq2seq}
+
+There is one powerful application of RNN based language model. The authors from \cite{Sustskever} used two RNNs to create an end-to-end translation model that is now know as \textit{the encoder-decoder} or \textit{the sequence-to-sequence} (seq2seq) architecture. This architecture is define as follows: let $\vect{x}^{(1)}, \dots, \vect{x}^{(n)}$ be a source sentence in the one-hot representation,  let $\vect{y}^{(1)}, \dots, \vect{y}^{(m)}$ be the target sentence also in the one-hot format. $f_{enc}$ (the \textit{encoder}) is a RNN with the sole purpose of creating a vector representation of input language's sequences. $f_{dec}$ (the \textit{decoder}) is a language model for the target language. These models are trained together mapping source sentences to target sentences.
+
+For example, suppose the training pair $(\vect{x}^{(1)}, \dots, \vect{x}^{(n)}, \vect{y}^{(1)}, \dots, \vect{y}^{(m)})$ is ("Nas tardes de fazenda há muito azul demais", "In the farm’s afternoons there is too much blue"). Here we want the model to translate one Portuguese sentence to an English one. We first encode the Portuguese sentence in the vector $\vect{s}$, i.e.,
+
+\begin{equation}
+\vect{s} = f_{enc}(\vect{x}^{(n)}, \vect{h}^{(n-1)})
+\end{equation}
+
+Then using the control English sentence as a target, at each time $t$ we compute the cross entropy error between the decoder prediction $f_{dec}(\vect{y}^{(t)}, \vect{\tilde{h}}^{(t-1)})$ and the target $\vect{y}^{(t+1)}$ ($\vect{y}^{(0)}$ is the $<eos>$ token). The decoder uses the vector representation of the source sentence $\vect{s}$ as an initial hidden state (i.e., $\vect{\tilde{h}}^{(0)} = \vect{s}$). The goal of this model is to to approximate the probability distribution over the tokens from the target language given the sentence of the source language, i.e.,
+
+\begin{equation}
+\vect{\tilde{h}}^{(t)} = f_{dec}(\vect{y}^{(t)}, \vect{\tilde{h}}^{(t-1)})
+\end{equation}
+
+\begin{equation}
+\label{decpred}
+p(y_t | y_1, \dots, y_{t-1}, x_1, \dots, x_{n}) = softmax(\vect{W}_{s}  \vect{\tilde{h}}^{(t)} + \vect{b}_s)
+\end{equation}
+
+One limitation of this architecture is that the source sentence, in some cases, has more features than the decoder embedding $\vect{s}$ can properly summarize. To address that some attention mechanisms were introduced.
+
+\section{Attention}
+\label{sec:Attention}
+
+The attention-based models are models built on top of the seq2seq architecture. The encoding part continues the same as before, but now at each time $t$ a context vector $\vect{c}^{(t)}$ is defined to capture relevant source-side information to help the prediction of the current target word $\vect{y}^{(t)}$. Once $\vect{c}^{(t)}$ is constructed the attention hidden state is defined as:   
+
+\begin{equation}
+\vect{\tilde{h}}^{(t)} = tahn(\vect{W}_c[\vect{c}^{(t)};\vect{h}^{(t)}])
+\end{equation}
+
+With the attention hidden state defined, the model's prediction is the same as the one defined in \ref{decpred}.
+
+The core of this technique is the definition of $\vect{c}^{(t)}$. There are different strategies available, here we will focus only on one: \textit{global attention}.
+
+Let $\vect{a} \in \mathbb{R}^{m,n}$. We will use this matrix as an alignment matrix, i.e., at the end of the training $\vect{a}_{ts}$ should reflect the probability of the source representation $\vect{h}^{(s)}$ be relevant for the output $\hat{y}^{(t)}$. We define $\vect{a}_{ts}$ as
+
+
+\begin{equation}
+\vect{a}_{ts} = \frac{exp(score(\vect{\tilde{h}}_t,\vect{h}_s))}{\sum_j exp(score(\vect{\tilde{h}}_t,\vect{h}_j))}
+\end{equation}
+
+Where $score$ is a content-based function that can have different implementations: 
+
+\begin{equation}
+score(\vect{\tilde{h}}_t,\vect{h}_s) = \begin{cases}
+\vect{\tilde{h}}_t ^{\top}\vect{h}_s\\
+\vect{\tilde{h}}_t ^{\top}\vect{W}_a \vect{h}_s\\
+\vect{v}_a ^{\top}tahn(\vect{W}_a[\vect{\tilde{h}}_t;\vect{h}_s])\\
+\end{cases}
+\end{equation}
+
+At the end, a global context vector $\vect{c}^{(t)}$ is computed as the weighted average, according to $\vect{a}_t$ over all source states:
+
+\begin{equation}
+\vect{c}^{(t)} = \sum_{s} \vect{a}_{ts}\vect{h}^{(s)}
+\end{equation}
+
+
+

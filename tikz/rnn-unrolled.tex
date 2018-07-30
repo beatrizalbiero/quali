@@ -1,0 +1,38 @@
+\newcommand{\rnnSimple}[5]{
+
+% operations
+\node[deterministic, minimum size=25pt,#4] (h#3) {$\textbf{h}_{#1}$};
+\node[input, minimum size=25pt,below=25pt of h#3] (x#3) {$\textbf{x}_{#1}$};
+\node[deterministic, minimum size=25pt, above=25pt of h#3, #5] (yhat#3) {$\mathbf{y}_{#1}$};
+
+% edges
+\path[pedge] (x#3) edge node[midway] {$\theta_{xh}$} (h#3);
+\path[pedge] (h#3) edge node[midway] {$\theta_{hy}$} (yhat#3);
+}
+
+\begin{tikzpicture}[auto]
+
+% timestep 1
+\rnnSimple{1}{0}{t1}{}{dashed}
+
+% % timestep 0
+\node[input, minimum size=25pt,left=35pt of ht1] (ht0) {$\textbf{h}_{0}$};
+
+% % timestep 2
+\rnnSimple{2}{1}{t2}{right=40pt of ht1}{dashed};
+
+% middle of sequence ...
+\node[textonly, right=30pt of ht2] (middle) {$\boldsymbol{\cdots}$};
+
+% % timestep 2
+\rnnSimple{T}{1}{tT}{right=40pt of middle}{};
+
+
+% % state transfers
+\path[pedge] (ht0) edge node[midway] {$\theta_{hh}$} (ht1);
+\path[pedge] (ht1) edge node[midway] {$\theta_{hh}$} (ht2);
+\path[pedge] (ht2) -- (middle);
+\path[pedge] (middle) edge node[midway] {$\theta_{hh}$} (htT);
+
+\label{fig:rnn-unrolled}
+\end{tikzpicture}
