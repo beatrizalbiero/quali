@@ -1,34 +1,97 @@
-\chapter{Background}
+\chapter{Apresentação Teórica}
 \label{ch:02-background}
 
 We can make human language manageable to computers by using a sort of different methods and techniques. This is the bread and butter of any NLP researcher. Here, following the NLP community, we will focus only in the techniques derived from the machine learning field. In this chapter, we will present some abstract machine learning models follow by some applications in NLP. 
 
-\section{Machine Learning}
+\section{Redes Neurais}
 
-\textit{Machine learning} is the branch of computer science that deals with programs that can improve with experience (i. e., learn). Machine learning is divided into three main subareas: \textit{supervised learning}, \textit{reinforcement learning} and \textit{unsupervised learning}.
+Uma rede neural é, essencialmente, um modelo de aprendizado de máquina supervisionado %[ref] 
+que está a procura de aprender \textit{padrões}. A inspiração para o desenvolvimento desse tipo de modelagem surgiu a partir de estudos em neurosciência %[ref] 
+que concluiram que, diante de múltiplas apresentações de um mesmo estímulo, um mesmo grupo de neurônios sofre incitação e dispara%[ref david hubel ]
+.  Analogamente, o modelo artificial é composto por uma camada de \textit{input} (um vetor) que recebe diferentes estímulos (\textit{features}). A informação recebida é processada e distribuída ao longo de múltiplas conexões com a próxima camada. Tais conexões são representadas por uma matriz \textbf{W} de pesos que passa por uma função de ativação\footnote{Diferentes funções de ativação podem ser utilizadas, como por exemplo a Softmax, a RELU, a Tanh ou a própria Sigmoid apresentada no texto.}. A função de ativação aqui, funciona como uma forma de administração dos disparos dos neurônios, de modo a condicionar a probabilidade de disparo à equação \ref{eq:sigmoid}. Também é uma maneira de garantir ao sistema a produção de diferentes respostas para padrões diferentes utilizando a mesma rede. Além disso, permite com que o aprendizado ocorra de forma gradual, de modo que o efeito de estímulos passados ainda perdure por um longo período mesmo após a apresentação de novos estímulos 
+\input{tikz/sigmoid_plot.tex}
+(Fig. \ref{fig:sigmoidplot}). Após essa transformação, o resultado serve como novo input para a próxima camada e assim sucessivamente até a última, a camada de \textit{output}.
 
-We will work with supervised learning only. In this setting, we assume that the process of interest is defined by an unknown function $g:X\rightarrow Y$. We try to approximate $g$ by changing the parameters of a function $f$ through an optimization process. The optimization is done by defining an \textit{error function} that evaluates how well $f$ approximates $g$ in the part of $g$ that we have access: the training data $D = \{(\vect{x}^{(1)}, \vect{y}^{(1)}), \dots ,(\vect{x}^{(N)}, \vect{y}^{(N)})\}$ (where $g(\vect{x}^{(i)})=\vect{y}^{(i)}$).
+\begin{align}\label{eq:sigmoid}
+p(w_{i} = 1) = \frac{1}{1+e^{\sum_{i} w_{i}x_{i} + b}}
+\end{align}
 
-
-$f$ can be a function from any family of models. One family that is having a lot of success for language tasks is the \textit{neural network} family.
-
-\section{Neural Networks}
-
-A neural network is a non-linear function $f(\vect{x}; \vect{\theta})$. It is defined by a collection of parameters $\vect{\theta}$ and a collection of non-linear transformations. It is usual to represent $f$ as a compositions of functions:
+Algebricamente, pode-se representar o processo descrito através da composição de múltiplas funções, uma vez que o resultado das operações precedentes servirão como entrada para as próximas camadas.
 
 \begin{align}
 f(\vect{x}; \vect{\theta}) &= f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1); \vect{W}_2, \vect{b}_2)\\
-&= softmax(\vect{W}_2 (\sigma(\vect{W}_1\vect{x} + \vect{b}_1)) + \vect{b}_2)
+&= \sigma(\vect{W}_2 (\sigma(\vect{W}_1\vect{x} + \vect{b}_1)) + \vect{b}_2)
 \end{align}
 
+\subsection{Treinamento}
 
-The output of these intermediary functions are referred as \textit{layers}. So in the example above, $\vect{x}$ (the output of the identity function) is the \textit{input layer}, $f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1)$ is the \textit{hidden layer} and $f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1); \vect{W}_2, \vect{b}_2)$ is the \textit{output layer}. Since each layer is a vector, we normally speak about the \textit{dimension} of a layer. For historical reasons we also say that each entry on a layer is a \textit{node} or a \textit{neuron}.  Models with a large number of hidden layers are called \textit{deep models}, for this reason the name \textit{deep learning} is used.  
+Para que a rede seja capaz de identificar os padrões desejados, é necessário alimentá-la com o que se espera como resposta (\textit{targets}), pois o treinamento da mesma consiste, essencialmente, na atualização das matrizes de pesos que deve ocorrer a partir da comparação entre os valores previstos pela rede (\textit{outputs}) e os \textit{targets}. A comparação entre esses valores se dá por meio de uma função de custo (\textit{Loss Function}), que representa uma forma de se quantificar o quão perto se está de uma rede ideal em que os outputs correspondam exatamente aos targets. Nesse sentido, encontrar o mínimo desta função significa também encontrar os melhores pesos para o aprendizado da tarefa em questão.
+%colocar a referencia do Deep Learning, a practioneers approach
 
-\par A neural network is a function approximator: it can approximate any Borel measurable function from one finite dimensional space to another with any desired nonzero amount of error. This theoretical result is know as the \textit{universal approximation theorem} \cite{Cybenko}. Without entering in the theoretical concepts, it suffice to note that the family of Borel mensurable functions include all continuous functions on a closed and bounded subset of $\mathbb{R}^n$.
+\section{Modelagem em Redes Neurais para os Verbos do Português Brasileiro}
+
+O esquema apresentado pelos pesquisadores Rumelhart e McClelland represetado na Fig. \ref{fig:esquemafdd} é conhecido como uma arquitetura do tipo \textit{Feed-Forward} porém sem camadas intermediárias. Nesse caso, todos os nódulos da camada de input se conectam diretamente aos nódulos da camada de output.
+
+Por se tratarem de dados linguísticos (caracteres), os pesquisadores apresentam a codificação dos fonemas em representações vetoriais, introduzindo portanto a noção de \textit{Wickelfeatures}.
+
+\subsection{Wickelfeatures}
+
+Como descrito na Seção \ref{ch:01-introduction}, as unidades de input e output correspondem às features fonológicas que caracterizam os verbos no tempo presente. Rumelhart e McClelland propõe a caracterização de cada fonema como uma combinação de features em apenas 4 dimensões. O fonema \textit{d}, por exemplo, é caracterizado por um conjunto de 4 features: Consoante Interrompida, Vozeada, - e -. %Stop ? e Middle?.
+Nesse sentido, os pesquisadores apresentam uma tabela que codifica cada fonema na língua inglesa às quatro dimensões de features. A Tabela \ref{tab:Tab1} foi baseada nesse sistema de codificação, porém simplificado e adaptado para o português brasileiro. A primeira dimensão da tabela divide os fonemas em três grandes grupos: consoantes interrompidas, continuadas ou vogais. A segunda dimensão aumenta o grau de resolução da primeira e ainda as divide em stops e nasais, %ver traducoes
+fricativas e líquidas, altas e baixas. A terceira dimensão classifica os fonemas de acordo com três simples pontos de articulação: Frontal, Média ou Back. %ver traducao para Back.
+A quarta dimensão subcategoriza as consoantes em vozeadas vs. não-vozeadas e as vogais em longas e curtas. A presença de cada uma destas features em um determinado fonema recebe o valor $1$, enquanto que a ausência, $0$.
+Com base na tabela %ref
+portanto, o fonema \textit{d} passa a ser representado pelo vetor:
+
+\begin{align}
+d \Rightarrow (100)(10)(010)(10)
+\end{align}
+
+Contudo, por se tratarem de dados linguísticos, é imprescindível que a própria sequência fonológica também seja representada. Desse modo, os pesquisadores optam por representar, em cada vetor de input, uma sequência de três features (uma feature para cada fonema subsequente) para cada uma das dimensões propostas. Por fim, é feita uma última ressalva. Após o treinamento da rede, é necessária a criação de uma função capaz de decodificar os resultados obtidos pela camada de output. O problema se dá pois, uma vez que os vetores são introduzidos na rede, a noção de sequência se perde. Para solucionar este problema, os pesquisadores introduzem mais uma última dimensão a cada fonema, a dimensão de \textit{boundary}. Com isso, o \textit{token} de '\#' é introduzido ao início e ao fim de cada um dos verbos para "notificar" à rede de que ela está processando um item de início ou final de palavra. Desse modo, as equações \ref{token1} e \ref{token2} exibem as representações vetoriais do token de boundary e dos fonemas \textit{d} e \textit{a} considerando a última dimensão mencionada.
+
+\begin{align}
+\# \Rightarrow (000)(00)(000)(00)(1)\label{token1}\\
+d \Rightarrow (100)(10)(010)(10)(0)\label{token2}\\
+a \Rightarrow (001)(01)(010)(01)(0)\label{token3}
+\end{align}
+
+Por fim, cada dimensão de um fonema pode ser combinado com todas as dimensões do próximo fonema da sequência, ou seja, procura-se estudar não somente a relação entre as consoantes interrompidas e as vogais, mas também entre as consoantes interrompidas e formações fonológicas com ponto de articulação médio. Os pesquisadores definem como um \textit{Wickelfeature} cada sequência de três \textit{features} fonológicas e é esta informação que serve como entrada para a rede neural responsável por detectar as irregularidades verbais.
 
 
+\begin{table}[ht!]
+\center
+    \begin{tabular}{lrrrrrrr}\toprule
+        &\multicolumn{2}{c}
+{}&\multicolumn{1}{c}     {\textbf{Anterior}}&\multicolumn{2}{c}{\textbf{Médio}}&\multicolumn{2}{c}{\textbf{Posterior}}
+        \\\cmidrule(r){3-4}\cmidrule(r){5-6}\cmidrule(r){7-8}   
+        &&V/L&U/S&V/L&U/S&V/L&U/S\\\midrule
+        Int.&    Stop & b & p
+                & d & t
+                & g & k\\
+                &Nasal & m
+                & & n
+                & & 
+                & \\
+        Cont. & Fricat. & v& f
+                & z & s
+                & j & x\\
+                &Liq. &l
+                & &r
+                & &
+                & h\\
+        Vowel & Alta & e & i 
+                &   &  
+                & o & u\\
+              & Baixa & & E
+              & &a
+              & & O
+        \\\bottomrule
+    \end{tabular}
+    \caption{Categorização de fonemas em quatro dimensões adaptada ao Português Brasileiro}\label{tab:Tab1}
+\end{table} 
 
-Different deep learning architectures are used in NLP: \textit{convolutional architectures} have a good performance in tasks were it is required to find a linguistic indicator regardless of its position (e.g., document classification, short-text categorization, sentiment classification, etc); high quality word embeddings can be achieved with models that are a kind of \textit{feedforward neural network} \cite{Mikolov23}. But for a variety of works in natural language we want to capture regularities and similarities in a text structure. That is way \textit{recurrent} and \textit{recursive} models have been widely used in the field. Here we are focused on generative models and since recurrent models have been producing very strong results for language modeling \cite{goldberg15}, we will concentrate on them.
+\subsection{Codificação}
+Cada verbo que participa da etapa de treinamento da rede, passa por um processo inicial de codificação. 
 
 
 \section{Recurrent Neural Network}

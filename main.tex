@@ -2,8 +2,9 @@
 
 % ---------------------------------------------------------------------------- %
 % Pacotes 
+
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}
+\usepackage[portuguese]{babel}
 % \usepackage[latin1]{inputenc}
 \usepackage[utf8x]{inputenc}
 \usepackage[pdftex]{graphicx}           % usamos arquivos pdf/png como figuras
@@ -13,6 +14,7 @@
 \usepackage[nottoc]{tocbibind}          % acrescentamos a bibliografia/indice/conteudo no Table of Contents
 \usepackage{courier}                    % usa o Adobe Courier no lugar de Computer Modern Typewriter
 \usepackage{type1cm}                    % fontes realmente escaláveis
+\usepackage{tipa}                       % para utilizar simbolos foneticos
 \usepackage{listings}                   % para formatar código-fonte (ex. em Java)
 \usepackage{titletoc}
 \usepackage{lmodern}
@@ -31,7 +33,9 @@
 \usepackage[pdftex,plainpages=false,pdfpagelabels,pagebackref,colorlinks=true,citecolor=DarkGreen,linkcolor=NavyBlue,urlcolor=DarkRed,filecolor=green,bookmarksopen=true]{hyperref} % links coloridos
 \usepackage[all]{hypcap}                    % soluciona o problema com o hyperref e capitulos
 \usepackage[round,sort,nonamebreak]{natbib} % citação bibliográfica textual(plainnat-ime.bst)
-\fontsize{60}{62}\usefont{OT1}{cmr}{m}{n}{\selectfont}
+\usepackage{pgfplots}
+\fontsize{60}{62}\usefont{OT1}{cmr}{m}{n}
+{\selectfont}
 
 % ---------------------------------------------------------------------------- %
 % Cabeçalhos similares ao TAOCP de Donald E. Knuth
@@ -107,6 +111,29 @@ framexrightmargin=10pt
 \usepackage{graphicx}
 % \usepackage[table,xcdraw]{xcolor}
 \usepackage{colortbl}
+\usepackage{algpseudocode}
+
+% Declaracoes em Português
+\algrenewcommand\algorithmicend{\textbf{fim}}
+\algrenewcommand\algorithmicdo{\textbf{faça}}
+\algrenewcommand\algorithmicwhile{\textbf{enquanto}}
+\algrenewcommand\algorithmicfor{\textbf{para}}
+\algrenewcommand\algorithmicif{\textbf{se}}
+\algrenewcommand\algorithmicthen{\textbf{então}}
+\algrenewcommand\algorithmicelse{\textbf{senão}}
+\algrenewcommand\algorithmicreturn{\textbf{devolve}}
+\algrenewcommand\algorithmicfunction{\textbf{função}}
+
+% Rearranja os finais de cada estrutura
+\algrenewtext{EndWhile}{\algorithmicend\ \algorithmicwhile}
+\algrenewtext{EndFor}{\algorithmicend\ \algorithmicfor}
+\algrenewtext{EndIf}{\algorithmicend\ \algorithmicif}
+\algrenewtext{EndFunction}{\algorithmicend\ \algorithmicfunction}
+
+% O comando For, a seguir, retorna 'para #1 -- #2 até #3 faça'
+\algnewcommand\algorithmicto{\textbf{até}}
+\algrenewtext{For}[3]%
+{\algorithmicfor\ #1 $\gets$ #2 \algorithmicto\ #3 \algorithmicdo}
 
 \usepackage{adjustbox}
 
@@ -120,8 +147,9 @@ framexrightmargin=10pt
 \SetKwComment{Comment}{$\triangleright$\ }{}
 
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,positioning,fit}
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds}
 \include{tikz/styles}
+\usepackage{tkz-euclide}
 
 \include{definitions}
 
@@ -145,35 +173,26 @@ framexrightmargin=10pt
 \thispagestyle{empty}
 \begin{center}
     \vspace*{2.3cm}
-    \textbf{\Large{Adding semantic robustness to dialog agents}}\\
+    \textbf{\Large{Um Estudo Sobre as Irregularidades Verbais do Português Brasileiro Via Redes Neurais Artificiais
+}}\\
     
     \vspace*{1.2cm}
-    \Large{Felipe de Souza Salvatore}
+    \Large{Beatriz Albiero}
     
     \vskip 2cm
     \textsc{
-    Research Project\\[-0.25cm]
-    submitted to\\[-0.25cm]
-    the\\[-0.25cm]
-    Institute of Mathematics and Statistics\\[-0.25cm]
-    of\\[-0.25cm]
-    University of São Paulo\\[-0.25cm]
-    for the\\[-0.25cm]
-    Qualifying Examination\\[-0.25cm]
-    for the\\[-0.25cm]
-    Degree of Doctor of Philosophy}
+    Relatório de Qualificação\\[+0.5cm]
+    Programa de Mestrado em Semiótica e Linguística Geral\\[+0.5cm]
+    Universidade de São Paulo\\[+0.5cm]
+    Edital 2º Semestre de 2017\\[+0.5cm]
+   }
     
-    \vskip 1.5cm
-    Program: Computer Science\\
-    Supervisor: Professor Marcelo Finger, PhD\\
-    Co-supervisor: Professor Roberto Hirata, PhD\\
-    
-
-   	\vskip 1cm
-    \normalsize{During the development of this research project\\the author received financial support from CAPES}
+    \vspace*{6.2cm}
+    Orientador: Professor Marcelo Barra Ferreira, PhD\\
+    Departamento de Linguística FFLCH-USP
     
     \vskip 0.5cm
-    \normalsize{São Paulo, June, 2018}
+    \normalsize{São Paulo, Setembro, 2018}
 \end{center}
 
 
@@ -182,17 +201,19 @@ framexrightmargin=10pt
 
 % ---------------------------------------------------------------------------- %
 % Abstract
-\chapter*{Abstract}
-\noindent Salvatore, F. \textbf{Adding semantic robustness to dialog agents}. 
+\chapter*{Resumo}
+\noindent Albiero, B. \textbf{Um Estudo Sobre as Irregularidades Verbais do Português Brasileiro Via Redes Neurais Artificiais}. 
 2018.
-Research Project (PhD) - Institute of Mathematics and Statistics,
-University of São Paulo, São Paulo, 2018.
+Projeto de Pesquisa (MSc) - Faculdade de Filosofia e Ciências Humanas,
+Universidade de São Paulo, São Paulo, 2018.
 \\
-\\
-Using the available dataset SICK (Sentence Involving Compositional Knowledge), we introduce a set of new question answering tasks \textbf{Entailment-QA} to measure how well a dialog system deals with abstract semantic knowledge. These tasks force the dialog agent to struggle with distinct notions that are at the intersection of text understanding and reasoning: boolean connectives, first-order quantifiers, synonymy/antinomy/hypernymy resolution, and paraphrase. Experimental results indicate that the current dialog systems present difficulties in solving these tasks.
 \\
 
-\noindent \textbf{Keywords:} Question answering, dialog systems, synthetic tasks, natural language processing.
+
+Inspirado no experimento conexionista de Rumelhart e McClelland de 1986, este projeto tem como principal objetivo um estudo sobre as irregularidades verbais do português brasileiro através de técnicas experimentais em aprendizado de máquina, em particular, redes neurais. Neste trabalho, busca-se desenvolver o aprendizado da conjugação de verbos para a primeira pessoa do singular no tempo presente do modo indicativo utilizando como referência a forma infinitiva dos mesmos. A escolha desta conjugação específica se dá pelo alto número de irregularidades presentes, fato que dificulta inclusive o processo de aprendizado infantil. Desde a apresentação do problema na década de 80, foram realizados múltiplos avanços tecnológicos e metodológicos que impulsionaram o desenvolvimento e o saber a respeito das técnicas de modelagem em redes neurais. Particularmente, uma técnica conhecida como “encoder-decoder” se destaca dentro do escopo linguístico mostrando-se relevante em múltiplas tarefas, como por exemplo no desenvolvimento de sistemas de diálogo e sistemas de tradução automática. É por esta razão que tal técnica foi utilizada como uma das principais ferramentas para a realização dos objetivos propostos. Para tal, é necessária a realização de uma busca pelos melhores hiperparâmetros bem como as melhores arquiteturas que possibilitem o aprendizado. Múltiplos experimentos serão então estudados e comparados com relação a diferentes métricas, mas principalmente com relação à acurácia. Por fim, espera-se comparar o desempenho do melhor modelo desenvolvido na tarefa de conjugação de pseudo-verbos com a intuição linguística de falantes na mesma tarefa.
+\\
+
+\noindent \textbf{Keywords:} Language Acquisition, Neural Networks, Connectionism, Natural Language Processing.
 
 % ---------------------------------------------------------------------------- %
 % Sumário
@@ -219,10 +240,16 @@ Using the available dataset SICK (Sentence Involving Compositional Knowledge), w
 % \singlespacing              % espaçamento simples
 \onehalfspacing            % espaçamento um e meio
 
+\part{Atividades Acadêmicas}
+\input{ch01-historicoescolar.tex}
+\input{ch02-atividadesacademicas.tex}
 
+\part{Projeto de Dissertação}
 \input{ch01-introduction}
 \input{ch02-background}
 \input{ch03-dialog-systems}
+
+\part{Próximos Passos}
 \input{ch04-methodology}
 
 % % cabeçalho para os apêndices
