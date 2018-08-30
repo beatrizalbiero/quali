@@ -129,25 +129,24 @@ framexrightmargin=10pt
 \algrenewtext{EndFor}{\algorithmicend\ \algorithmicfor}
 \algrenewtext{EndIf}{\algorithmicend\ \algorithmicif}
 \algrenewtext{EndFunction}{\algorithmicend\ \algorithmicfunction}
-
 % O comando For, a seguir, retorna 'para #1 -- #2 até #3 faça'
 \algnewcommand\algorithmicto{\textbf{até}}
 \algrenewtext{For}[3]%
 {\algorithmicfor\ #1 $\gets$ #2 \algorithmicto\ #3 \algorithmicdo}
 
 \usepackage{adjustbox}
-
+\usepackage{fancyvrb}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
 
 \usepackage{cases}
-
+\newcommand\tab[1][1cm]{\hspace*{#1}}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \SetKwComment{Comment}{$\triangleright$\ }{}
-
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds}
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds, arrows.meta}
+\newcommand{\empt}[2]{$#1^{\langle #2 \rangle}$}
 \include{tikz/styles}
 \usepackage{tkz-euclide}
 
@@ -247,10 +246,10 @@ Inspirado no experimento conexionista de Rumelhart e McClelland de 1986, este pr
 \part{Projeto de Dissertação}
 \input{ch01-introduction}
 \input{ch02-background}
-\input{ch03-dialog-systems}
+\input{ch03-preliminaryresults}
 
 \part{Próximos Passos}
-\input{ch04-methodology}
+\input{ch04-future}
 
 % % cabeçalho para os apêndices
 % \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }

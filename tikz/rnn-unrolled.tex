@@ -1,38 +1,49 @@
-\newcommand{\rnnSimple}[5]{
+\input{definitions/colors}
+\input{definitions/styles}
+
+% RNN STATE CELL ====================================
+
+\newcommand{\rnnSimple}[4]{
 
 % operations
-\node[deterministic, minimum size=25pt,#4] (h#3) {$\textbf{h}_{#1}$};
-\node[input, minimum size=25pt,below=25pt of h#3] (x#3) {$\textbf{x}_{#1}$};
-\node[deterministic, minimum size=25pt, above=25pt of h#3, #5] (yhat#3) {$\mathbf{y}_{#1}$};
+\node[normal, minimum size=40pt,#4] (h#3) {$\vect{h}^{#1}$};
+\node[normal, minimum size=40pt,below=30pt of h#3] (x#3) {$\vect{x}^{#1}$};
+\node[normal, minimum size=40pt, above=30pt of h#3] (yhat#3) {$\hat{\vect{y}}^{#1}$};
 
 % edges
-\path[pedge] (x#3) edge node[midway] {$\theta_{xh}$} (h#3);
-\path[pedge] (h#3) edge node[midway] {$\theta_{hy}$} (yhat#3);
+\path[tedge] (x#3) edge node[below right= -4pt] {} (h#3);
+\path[tedge] (h#3) edge node[below right = -4pt] {} (yhat#3);
 }
 
+\begin{figure}[ht!]
+\centering
+\hspace*{-1.0cm}
+\scalebox{0.9}{
 \begin{tikzpicture}[auto]
 
 % timestep 1
-\rnnSimple{1}{0}{t1}{}{dashed}
+\rnnSimple{(1)}{(0)}{t1}{}
 
 % % timestep 0
-\node[input, minimum size=25pt,left=35pt of ht1] (ht0) {$\textbf{h}_{0}$};
+\node[normal, minimum size=40pt,left=50pt of ht1] (ht0) {$\vect{h}^{(0)}$};
 
 % % timestep 2
-\rnnSimple{2}{1}{t2}{right=40pt of ht1}{dashed};
+\rnnSimple{(2)}{(1)}{t2}{right=50pt of ht1};
 
-% middle of sequence ...
-\node[textonly, right=30pt of ht2] (middle) {$\boldsymbol{\cdots}$};
 
 % % timestep 2
-\rnnSimple{T}{1}{tT}{right=40pt of middle}{};
+\rnnSimple{(3)}{(1)}{t3}{right=50pt of ht2};
 
 
 % % state transfers
-\path[pedge] (ht0) edge node[midway] {$\theta_{hh}$} (ht1);
-\path[pedge] (ht1) edge node[midway] {$\theta_{hh}$} (ht2);
-\path[pedge] (ht2) -- (middle);
-\path[pedge] (middle) edge node[midway] {$\theta_{hh}$} (htT);
+\path[tedge] (ht0) edge node[above right = 2pt] {} (ht1);
+\path[tedge] (ht1) edge node[above right = 2pt] {} (ht2);
+\path[tedge] (ht2) edge node[above right = 2pt] {} (ht3);
 
-\label{fig:rnn-unrolled}
 \end{tikzpicture}
+}%\scalebox
+\caption{Representação Expandida de uma RNN}
+\label{fig:unfoldedrnn}
+\end{figure}
+
+
