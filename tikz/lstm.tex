@@ -67,14 +67,14 @@
     \node [function] (func1) at (1.5,0.75) {Tanh};
 
     % Draw External inputs? named as basis c,h,x
-    \node[ct, label={[mylabel]Cell}] (c) at (-4,1.5) {\empt{c}{t-1}};
-    \node[ct, label={[mylabel]Hidden}] (h) at (-4,-1.5) {\empt{h}{t-1}};
+    \node[ct, label={[mylabel]Cell State (t-1)}] (c) at (-4,1.5) {\empt{c}{t-1}};
+    \node[ct, label={[mylabel]Estado de (t-1)}] (h) at (-4,-1.5) {\empt{h}{t-1}};
     \node[ct, label={[mylabel]left:Input}] (x) at (-2.5,-3) {\empt{x}{t}};
 
     % Draw External outputs? named as basis c2,h2,x2
-    \node[ct, label={[mylabel] }] (c2) at (4,1.5) {\empt{c}{t}};
-    \node[ct, label={[mylabel]  }] (h2) at (4,-1.5) {\empt{h}{t}};
-    \node[ct, label={[mylabel]left: }] (x2) at (2.5,3) {\empt{h}{t}};
+    \node[ct, label={[mylabel] Cell State (t)}] (c2) at (4,1.5) {\empt{c}{t}};
+    \node[ct, label={[mylabel] Estado (t) }] (h2) at (4,-1.5) {\empt{h}{t}};
+    \node[ct, label={[mylabel]left: Estado (t)}] (x2) at (2.5,3) {\empt{h}{t}};
 
 % Start connecting all.
     %Intersections and displacements are used. 

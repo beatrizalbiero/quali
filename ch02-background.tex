@@ -1,7 +1,8 @@
-\chapter{Apresentação Teórica}
+\chapter{Introdução a Redes Neurais}
 \label{ch:02-background}
 
-We can make human language manageable to computers by using a sort of different methods and techniques. This is the bread and butter of any NLP researcher. Here, following the NLP community, we will focus only in the techniques derived from the machine learning field. In this chapter, we will present some abstract machine learning models follow by some applications in NLP. 
+%\epigraph{Those who cannot remember the past are condemned to compute it.}{\textit{Steven Pinker}}
+\epigraph{\itshape Those who cannot remember the past are condemned to compute it.''}{---Steven Pinker, \textit{Words and Rules}}
 
 \section{Redes Neurais}
 
@@ -28,7 +29,7 @@ f(\vect{x}; \vect{\theta}) &= f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1);
 Para que a rede seja capaz de identificar os padrões desejados, é necessário alimentá-la com o que se espera como resposta (\textit{targets}), pois o treinamento da mesma consiste, essencialmente, na atualização das matrizes de pesos que deve ocorrer a partir da comparação entre os valores previstos pela rede (\textit{outputs}) e os \textit{targets}. A comparação entre esses valores se dá por meio de uma função de custo (\textit{Loss Function}), que representa uma forma de se quantificar o quão perto se está de uma rede ideal em que os outputs correspondam exatamente aos targets. Nesse sentido, encontrar o mínimo desta função significa também encontrar os melhores pesos para o aprendizado da tarefa em questão.
 %colocar a referencia do Deep Learning, a practioneers approach
 
-\section{Modelagem em Redes Neurais para os Verbos do Português Brasileiro}
+\section{Modelo Apresentado pelos Pesquisadores Rumelhart e McClelland (1986)}
 
 O esquema apresentado pelos pesquisadores Rumelhart e McClelland represetado na Fig. \ref{fig:esquemafdd} é conhecido como uma arquitetura do tipo \textit{Feed-Forward-Network (FFD)} porém sem camadas intermediárias. Nesse caso, todos os nódulos da camada de input se conectam diretamente aos nódulos da camada de output.
 
@@ -132,10 +133,9 @@ Exemplos:
 \section{Redes Neurais Recorrentes}
 \label{sec:RNN}
 
-A Seção \ref{sec:wickelfeatures} serve de exemplo para evidenciar a dificuldade ao se utilizar a arquitetura FFN na modelagem de dados sequencias. Certamente, os processos descritos nas subseções \ref{sec:cod} e \ref{sec:dec} não se apresentam como componentes simples ou orgânicos, tão pouco eficientes. O problema anunciado pela modelagem desse tipo de dado motivou o desenvolvimento de uma nova família de redes neurais, as Redes Neurais Recorrentes (\textit{Recurrent Neural Network - RNN}). 
+A Seção \ref{sec:wickelfeatures} serve de exemplo para evidenciar a dificuldade ao se utilizar a arquitetura FFN na modelagem dos dados apresentados. Certamente, os processos descritos nas subseções \ref{sec:cod} e \ref{sec:dec} não se apresentam como componentes simples ou orgânicos, tão pouco eficientes. O problema do processamento de dados sequenciais motivou o desenvolvimento de uma nova família de redes neurais, as Redes Neurais Recorrentes (\textit{Recurrent Neural Network - RNN}). 
 
-A ideia central desse modelo consiste na retroalimentação dos elementos sequenciais, de modo que o \textit{input} de cada um deles serve, não somente para a previsão do próximo item da sequência, mas também para a formação de um componente intermediário, um \textit{estado}. Esses estados, representados na Figura \ref{fig:unfoldedrnn} como $\vect{h}$'s %colocar notacao de vetor aqui
-funcionam como uma espécie de memória condensada dos elementos precedentes e influenciam diretamente os estados posteriores. Essa é uma maneira de retransmitir a cada momento os efeitos dos inputs anteriores para o restante da sequência.
+A ideia central desse modelo consiste na retroalimentação dos elementos sequenciais, de modo que o \textit{input} de cada um deles serve, não somente para a previsão do próximo item da sequência, mas também para a formação de um componente intermediário, um \textit{estado}. Esses estados, representados na Figura \ref{fig:unfoldedrnn} como $\vect{h}$'s funcionam como uma espécie de memória condensada dos elementos precedentes e influenciam diretamente os estados posteriores. Essa é uma maneira de retransmitir a cada momento os efeitos dos inputs anteriores para o restante da sequência.
 
 %\input{tikz/rnn-cell.tex}
 \input{tikz/rnn-unrolled.tex}
@@ -147,31 +147,36 @@ Os estados indicados na Fig. \ref{fig:unfoldedrnn} são calculados a partir da e
 \label{eq:rnn}
 \end{equation}
 
-Como visto, o estado do passo atual depende do input atual e do estado calculado anteriormente resultando em um cálculo recursivo.  
+\subsection{Treinamento}
 
-Apesar da praticidade desse tipo de rede, ela infelizmente apresenta problemas em decorrência de sua natureza recorrente. A multiplicação sucessiva de matrizes pode causar a explosão ou o desaparecimento dos gradientes (exploding - vanishing gradients). Os gradientes são parte fundamental do treinamento das redes, são eles que garantem que os pesos estejam sendo atualiazados na direção correta e na proporção correta. %incluir referencia sobre exploding vanishing gradients
-Arquiteturas com esse problema podem tornar o treinamento das redes instável e incapaz de aprender com os exemplos do treinamento. Portanto, dependências de longa distância temporal se tornaram um grande problema para o uso das RNN's. Diferentes soluções foram apresentadas para essa questão, entre elas, uma arquitetura conhecida como \textit{Long Short-Term Memory - LSTM}. %incluir ref.
+Na prática, essa arquitetura simplificaria algumas das etapas do processo de predição de irregularidades verbais. A primeira delas seria o processo de codificação dos verbos. Por exemplo, ao se utilizar uma rede recorrente, não há mais a necessidade da ativação de unidades em trigramas. Basta analisar item a item da sequência. No treinamento desse tipo de rede, os inputs são dados por cada um dos itens da série e, os targets, por sua vez, são seus respectivos itens subsequentes. Tokens de final de sequência (<eos>) são acrescentados nos targets para que a rede considere como possibilidade o fim da sequência. O processo de decodificação dos verbos também torna-se desnecessário uma vez que o output é computado item após item. A Fig. \ref{fig:rnnpractice} ilustra o problema da predição de fonemas dada uma base de verbos conjugados. No exemplo, considera-se o treinamento da palavra \textit{"pa.r\textupsilon"}. 
+
+Apesar da praticidade desse tipo de rede, ela infelizmente apresenta alguns problemas para tarefas que envolvem dependências de longa distância, o que normalmente é o caso quando se trata de tarefas linguísticas. O problema ocorre porque, a cada \textit{input}, as matrizes de pesos são atualizadas fazendo com que as últimas informações recebidas sejam mais relevantes do que as anteriores, impedindo o progresso do treinamento. Dessa forma, apresentam-se na literatura algumas soluções. Entre elas, uma arquitetura conhecida como \textit{Long Short-Term Memory - LSTM}.
+
+\input{tikz/rnn-practice.tex}
 
 \subsection{Long Short-Term Memory}
 \label{sec:LSTM}
 
-A chave para entender como as LSTM's lidam com o problema de longas dependências está no entendimento do componente chamado de \textit{cell state}. Esse componente funciona como uma corrente transportadora de informação e é regulado por estruturas que funcionam como válvulas (\textit{gates}). Os \textit{gates} são uma forma de filtragem de informação, basicamente eles são responsáveis por selecionar informações antigas que podem ser esquecidas e novas que sejam relevantes. 
+Uma LSTM continua sendo uma RNN, porém existem algumas especificidades em sua arquitetura que a tornam mais elaborada e mais adequada para atender aos treinamentos que envolvem longa dependência. A chave para entender como as LSTM's lidam com esse problema está no entendimento de um componente chamado de \textit{cell state}. Esse componente funciona como uma corrente transportadora de informação e é regulado por estruturas que funcionam como válvulas (os \textit{gates}). Os \textit{gates} são uma forma de filtragem de informação. Eles são basicamente responsáveis por selecionar informações antigas que podem ser esquecidas e novas que sejam relevantes. 
 
 %imagem de LSTM
 \input{tikz/lstm.tex}
 
+A Fig. \ref{fig:lstm} deve ser interpretada da seguinte forma: A cada novo input ($x(t)$), uma camada LSTM recebe o estado $h(t-1)$ gerado pelo input anterior assim como uma RNN comum receberia, mas recebe também o Cell State de (t-1). O Cell State traz consigo uma lista de todas as informações que ele considera que devem ser carregadas e mantidas durante todo o treinamento. Após a intervenção dos gates, o modelo pode decidir por agregar novas informações e esquecer outras nessa lista, gerando assim um novo Cell State (t). Além disso, a passagem desse input por essa camada também gera um novo estado ($h(t)$) que, além de servir como referência para o cálculo do output de (t), servirá também como referência para o próximo processamento ($x(t+1)$). %referencias
 
+\section{Encoder-Decoder}
 
-% \textit{Long short-term memory} (LSTM) is one of the most applied versions of the RNN family of models. Historically it was developed before the GRU model, but conceptually we can think in the LSTM as an expansion of the model presented in the last session. Because of notation differences they can look different. LSTM is also based on parametrized gates; in this case three: the \textit{forget gate}, $\vect{f}^{(t)}$, the \textit{input gate}, $\vect{i}^{(t)}$, and the \textit{output gate}, $\vect{o}^{(t)}$. The gates are defined only by $\vect{h}^{(t-1)}$ and $\vect{x}^{(t)}$ with specific parameters:
+Como apresentado na Seção \ref{sec:RNN}, os modelos de LSTM mostram-se úteis na tarefa de predição de dados sequenciais. No entanto, o problema apresentado por esta pesquisa vai além disto. O objetivo desta pesquisa visa encontrar modelos preditivos de irregularidades verbais do português brasileiro tendo como referência as suas respectivas formas no infinitivo, assim como foi apresentado pelos pesquisadores Rumelhart e McClelland para a língua inglesa. Nesse sentido, treinar uma LSTM em uma base de verbos já conjugados não faz sentido. É preciso considerar um modelo que seja capaz de traduzir os verbos de uma forma para a outra. 
 
+\subsection{Machine Translation}
 
-% \begin{equation}
-% \vect{f}^{(t)} = \sigma(\vect{W}_{f} \vect{h}^{(t-1)} + \vect{U}_{f} \vect{x}^{(t)} + \vect{b}_{f})
-% \end{equation}
+Um modelo de mapeamento encoder-decoder é um sistema composto por duas RNNs (ou LSTMs) cuja principal função é mapear sequências. A primeira rede, chamada encoder, mapeia dado input e o transforma em uma representação codificada, esta alimenta então a segunda rede, decoder, que, por sua vez, gera uma nova sequência. 
 
-% \begin{equation}
-% \vect{i}^{(t)} = \sigma(\vect{W}_{i} \vect{h}^{(t-1)} + \vect{U}_{i} \vect{x}^{(t)} + \vect{b}_{i})
-% \end{equation}
+Em um contexto de tradução do inglês para o português, por exemplo, uma rede encoder seria treinada com um corpus em inglês o qual apresenta determinadas probabilidades de arranjo sintático e valores semânticos, ou seja, uma gestalt sequencial armazenada em uma matriz. A rede decoder, ao ser treinada na língua alvo, isto é, português, leva em consideração tanto as características sintático-semânticas desta quanto a gestalt da rede encoder, gerando desta forma uma nova sequência que contempla ambas as línguas e assemelha-se a uma tradução humana.
+
+Em função de uma similaridade conceitual, este modelo foi escolhido, uma vez que possibilita uma interação mediada pela essência de duas qualidades de padrões sequencias e produz um resultado orgânico, semelhante, por exemplo, a intuição de um falante nativo que advinha a conjugação da primeira pessoa do presente a partir de um verbo no infinitivo. 
+\input{tikz/seq2seq.tex}
 
 % \begin{equation}
 % \vect{o}^{(t)} = \sigma(\vect{W}_{o} \vect{h}^{(t-1)} + \vect{U}_{o} \vect{x}^{(t)} + \vect{b}_{o})
