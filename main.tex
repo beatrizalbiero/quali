@@ -8,6 +8,7 @@
 % \usepackage[latin1]{inputenc}
 \usepackage[utf8x]{inputenc}
 \usepackage[pdftex]{graphicx}           % usamos arquivos pdf/png como figuras
+\usepackage[toc,page]{appendix}
 \usepackage{setspace}                   % espaçamento flexível
 \usepackage{indentfirst}                % indentação do primeiro parágrafo
 \usepackage{makeidx}                    % índice remissivo
@@ -46,7 +47,7 @@
 \fancyhf{}
 
 % new commands------------------------
-
+\usepackage{subcaption}
 \newcommand{\vect}[1]{\bm{#1}}
 \newcommand{\myprime}[1]{{#1}^{\prime}}
 \newcommand{\grad}[2]{\nabla_{#1} {#2}}
@@ -246,12 +247,15 @@ Inspirado no experimento conexionista de Rumelhart e McClelland de 1986, este pr
 \input{ch02-atividadesacademicas.tex}
 
 \part{Projeto de Dissertação}
-\input{ch01-introduction}
-\input{ch02-background}
-\input{ch03-preliminaryresults}
+\input{ch03-introduction}
+\input{ch04-background}
+\input{ch05-preliminaryresults}
 
 \part{Próximos Passos}
-\input{ch04-future}
+\input{ch06-future}
+
+\part{Apêndice}
+\input{ch07-appendice}
 
 % % cabeçalho para os apêndices
 % \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }
