@@ -104,16 +104,16 @@ Cada verbo que participa da etapa de treinamento da rede passa por um processo i
 \textbf{Passo 2:} O verbo é segmentado em trigramas:\\
 \hspace*{6.0em}\#,d,a - d,a,r - a,r,\#\\
 
-\textbf{Passo 3:} Um dicionário associa cada fonema a um vetor de features fonéticas.\\
+\textbf{Passo 3:} Um dicionário associa cada fonema a um vetor de features fonéticas, ou seja, toda possível combinação de features foi mapeada e é representada por um índice de um dicionário (como representado na Fig. \ref{fig:fdd}).\\
 
 \textbf{Passo 4:} As features dos trigramas são combinadas produzindo \textit{Wickelfeatures}.\\
 
 %alterar a identacao aqui
 Exemplos:
 \begin{itemize}
-\item boundary - int - vowel 
-\item boundary - stop - low
-\item boundary - middle - middle
+\item \# - int - vowel 
+\item \# - stop - low
+\item \# - middle - middle
 \item middle - middle - liq
 \item stop - low - cont
 \item ...
@@ -129,12 +129,22 @@ Exemplos:
 \subsection{Decodificação}
 \label{sec:dec}
 
-%falar brevemente sobre a dificuldade de se decodificar esses valores
+A primeira parte da decodificação da rede envolve a seleção das unidades de Wickelfeatures que compõe o início da palavra reconstituída. Primeiramente, selecionam-se todas as unidades que tem como primeira feature o indicador de fronteira '\#'. Em seguida, dentre estas, observam-se os 16 Wickelfeatures com maior score. Isto se dá pelo número total de features combinadas possíveis para cada dimensão nas duas posições subsequentes. Feita esta seleção, os fonemas \textit{competem} pelas features, ou seja, todos os fonemas que compartilham de uma mesma feature observada somam pontos. Ao final deste processo, espera-se que o fonema com mais pontos seja o fonema alvo da decodificação. Decodificam-se portanto os primeiros dois fonemas.
+
+A segunda parte do processo assemelha-se à primeira, porém ao invés da busca pelo trigrama inicial, selecionam-se todas as unidades que apresentam como feature na última posição o indicador de fronteira '\#'. O processo de competição novamente para a decodificação dos dois últimos fonemas.
+
+A terceira parte do processo de decodificação envolve uma busca de compatibilidade entre features para os trigramas que não consitutem início ou final de palavra. Uma vez que o primeiro trigrama de fonemas foi decodificado, selecionam-se as próximas unidades cujas duas primeiras posições sejam compatíveis com as duas últimas do último trigrama decodificado. O processo de competição de fonemas se repete em um loop até que haja compatibilidade com o trigrama final, encontrado na segunda etapa.
+
+O maior problema desta função de decodificação encontra-se na etapa da busca pelos trigramas que não constituem início ou fim de palavra. Dependendo da sequência, é possível que dois ou mais trigramas compartilhem de muitas unidades de Wickelfeatures, ou seja, se um Wickelfeature for ativado, não há como representar sua ativação uma segunda ou terceira vez, a sua ativação acontece apenas uma vez. Isto pode interferir na etapa de seleção de compatibilidades, fazendo com que a função não consiga sair do loop pois continua selecionando os mesmos Wickelfeatures. Esse problema já foi apontado por Pinker, %tal ref.
+No livro, Pinker comenta a dificuldade da rede de Rumelhart e McClelland ao tentar decodificar a palavra 'algalgal' (Oykangand). A situação referida é de ocorrência relativamente comum na língua portuguesa já que há a ocorrência quase sistemática de revezamentos entre consoantes e vogais. Este fato constituiu um problema pois ocasionou loops na decodificação de muitos verbos. Como solução, foi necessária a implementação de uma função que considerasse apenas os trigramas fronteiriços. Desse modo foi possível verificar a capacidade da rede em capturar os processos irregulares que normalmente ocorrem no início ou final das palavras. Para a palavra "postar", por exemplo, a irregularidade ocorre ao transmutar a vogal arredondada posterior semi-fechada para semi-aberta. Como essa irregularidade já pode ser detectada na primeira etapa da decodificação, pode-se avaliar o desempenho da rede baseado nesta etapa e desconsiderar a decodificação dos trigramas intermediários 'Ost' e 'stu' sem perda de informação.  
+
+Para concluir, a implementação de uma rede FFD para a predição de irregularidades verbais do português brasileiro mostrou-se uma tarefa de grande dificuldade e motivou a construção de novos tipos de arquitetura para o alcance dos objetivos propostos. 
+
 
 \section{Redes Neurais Recorrentes}
 \label{sec:RNN}
 
-A Seção \ref{sec:wickelfeatures} serve de exemplo para evidenciar a dificuldade ao se utilizar a arquitetura FFN na modelagem dos dados apresentados. Certamente, os processos descritos nas subseções \ref{sec:cod} e \ref{sec:dec} não se apresentam como componentes simples ou orgânicos, tão pouco eficientes. O problema do processamento de dados sequenciais motivou o desenvolvimento de uma nova família de redes neurais, as Redes Neurais Recorrentes (\textit{Recurrent Neural Network - RNN}). 
+A Seção \ref{sec:wickelfeatures} serve de exemplo para problematizar o uso da arquitetura FFD na modelagem dos verbos do português brasileiro. Certamente, os processos descritos nas subseções \ref{sec:cod} e \ref{sec:dec} não se apresentam como componentes simples ou orgânicos, tão pouco eficientes. O problema do processamento de dados sequenciais motivou o desenvolvimento de uma nova família de redes neurais, as Redes Neurais Recorrentes (\textit{Recurrent Neural Network - RNN}). 
 
 A ideia central desse modelo consiste na retroalimentação dos elementos sequenciais, de modo que o \textit{input} de cada um deles serve, não somente para a previsão do próximo item da sequência, mas também para a formação de um componente intermediário, um \textit{estado}. Esses estados, representados na Figura \ref{fig:unfoldedrnn} como $\vect{h}$'s funcionam como uma espécie de memória condensada dos elementos precedentes e influenciam diretamente os estados posteriores. Essa é uma maneira de retransmitir a cada momento os efeitos dos inputs anteriores para o restante da sequência.
 
