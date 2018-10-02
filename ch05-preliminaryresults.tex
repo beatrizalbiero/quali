@@ -5,32 +5,123 @@
 % “Language, never forget, is more fashion than science, and matters of usage, spelling and pronunciation tend to wander around like hemlines.” 
 % ― Bill Bryson, The Mother Tongue: English and How It Got That Way
 
-Neste capítulo serão discutidos resultados de múltiplos experimentos realizados a partir de diferentes tipos de modelagem de redes neurais. A primeira delas, baseada na pesquisa de Rumelhart e McClelland e discutida na Seção \ref{sec:arqFDD} e nomeada de FDD.
-A segunda, o modelo de Encoder-Decoder discutido na seção \ref{sec:enc-dec}. Os resultados das predições estão disponíveis em: 
+Neste capítulo serão discutidos resultados de múltiplos experimentos realizados a partir de diferentes tipos de modelagem de redes neurais. A primeira delas, baseada na pesquisa de Rumelhart e McClelland, discutida na Seção \ref{sec:arqFDD} e nomeada de FFD.
+A segunda, o modelo de Encoder-Decoder discutido na seção \ref{sec:enc-dec}. Todos os resultados obtidos a partir dos treinamentos estão organizados e disponíveis em: 
 \url{https://github.com/beatrizalbiero/MsResearch} nas seções \textbf{Wickelfeatures Net Results} e \textbf{Encoder-Decoder}.
 
+
+\section{Corpus e Metodologia}
+\label{sec:corpus-ffd}
+
+Para a execução dos experimentos, foi necessário restringir o escopo da pesquisa a um único tempo, modo, pessoa e número, já que o português apresenta formas irregulares em múltiplas combinações destes elementos e seria necessário construir uma rede diferente para cada uma destas combinações. Optou-se por estudar as irregularidades presentes nas flexões de primeira pessoa do singular no tempo presente, modo indicativo.  
+O corpus utilizado para o treinamento dessa rede foi baseado nas informações contidas em \url{https://www.conjugacao.com.br/verbos-irregulares/} e \url{https://www.conjugacao.com.br/verbos-regulares/}.\\
+
+Primeiramente, foi realizada uma etapa de extração dos verbos e suas respectivas conjugações para um banco de dados local via técnica de \textit{webscraping}, uma técnica que extrai informações contidas nas páginas da web. Em seguida, os verbos irregulares foram selecionados manualmente para diferentes famílias. Alguns dos verbos irregulares listados nas fontes não eram irregulares no processo de interesse e portanto foram realocados para o grupo de verbos regulares. Como um exemplo disto, um dos motivos para o verbo \textit{acudir} ser considerado irregular é a flexão que ocorre na terceira pessoa do singular no tempo presente e modo indicativo (acode), porém como na primeira pessoa do singular o padrão regular se mantém, esse verbo foi realocado para o grupo dos verbos regulares. Em seguida, os verbos foram transcritos manualmente para uma forma fonológica seguindo a codificação da Tabela \ref{tab:Tab1}. Dos 423 verbos extraídos, 20 foram considerados verbos sem possível agrupamento (verbos como "ir", "trazer" e "saber"), totalizando uma base de 214 verbos regulares e 209 regulares (50.6\% e 49.4\% respectivamente). A Tabela \ref{tab:classes} resume os tipos de irregularidades encontrados. 
+
+Em seguida, a base foi segmentada entre treino ($\thicksim$80\%) e teste ($\thicksim$20\%) respeitando-se as proporções intra-classe. As Tabelas \ref{tab:g1}, \ref{tab:g2}, \ref{tab:g3} e \ref{tab:g4} resumem as classes de irregularidades encontradas associadas ao número de exemplos presentes nas bases de treino e teste de cada respectiva classe em conjunto com o número de exemplos de verbos regulares da base e a Tabela \ref{tab:ratios} exibe as quantidades e proporções finais utilizadas nas bases de treino e teste.
+
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{l}
+Classes\\
+\toprule
+o\_ar:O\_u $\rightarrow$ tocar, toco\\
+o\_ir:u\_o $\rightarrow$ cobrir, cubro\\
+izer:igu $\rightarrow$ dizer, digo\\
+fazer:fasu $\rightarrow$ fazer, faço\\
+crer:eiu $\rightarrow$ crer, creio\\
+entir:intu $\rightarrow$ sentir, sinto\\
+or:oniu $\rightarrow$ pôr, ponho\\
+e\_ir:i\_u $\rightarrow$ seguir, sigo\\
+ter:teniu $\rightarrow$ ter, tenho\\
+e\_ar:E\_u $\rightarrow$ testar, testo\\
+ver:veju $\rightarrow$ ver, vejo\\
+vir:veniu $\rightarrow$ vir, venho
+\end{tabular}
+\end{center}
+\end{table}
+\captionof{table}{Classes de Verbos Irregulares}
+\label{tab:classes}
+
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{llllllll}
+iar: eiu & o\_ar: O\_u & o\_ir: u\_o & izer: igu & fazer: fasu & ler, crer: eiu & entir: intu & edir: Esu \\
+\toprule
+7        & 24          & 6           & 6         & 12          & 4              & 6           & 6        
+\end{tabular}
+\end{center}
+\end{table}
+\captionof{table}{Verbos Irregulares Grupo 1 Treino}
+\label{tab:g1}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{lllllll}
+or: oniu & e\_ir: i\_u & ter: teniu & e\_ar: E\_u & ver: veju & vir: veniu & regulares \\
+\toprule
+22       & 22          & 8          & 16          & 5         & 8          & 172     
+\end{tabular}
+\end{center}
+\end{table}
+\captionof{table}{Verbos Irregulares Grupo 2 Treino}
+\label{tab:g2}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{llllll}
+or: oniu & e\_ir: i\_u & ter: teniu & e\_ar: E\_u & ver: veju & vir: veniu \\
+\toprule
+22       & 22          & 8          & 16          & 5         & 8\\               
+\end{tabular}
+\end{center}
+\end{table}
+\captionof{table}{Verbos Irregulares Grupo 1 Teste}
+\label{tab:g3}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{lllllll}
+or: oniu & e\_ir: i\_u & ter: teniu & e\_ar: E\_u & ver: veju & vir: veniu & regulares \\
+\toprule
+5        & 5           & 2          & 4           & 1         & 2          & 42      
+\end{tabular}
+\end{center}
+\end{table}
+\captionof{table}{Verbos Irregulares Grupo 2 Teste}
+\label{tab:g4}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{lllll}
+\hline
+ & \textbf{Regulares} & \textbf{Irregulares} & \textbf{Total} & \textbf{\%} \\ \hline
+\textbf{Teste} & 42 & 36 & 78 & 19.35 \\ \hline
+\textbf{Treino} & 172 & 153 & 325 & 80.65 \\ \hline
+\textbf{Total} & 214 & 189 & 403 & 100 \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+\captionof{table}{Proporção entre Verbos Regulares e Irregulares nos datasets}
+\label{tab:ratios}
 
 \section{Rede FFD}
 \label{sec:ffd}
 
-A rede desenvolvida possui uma camada de Input e uma de Output, ambas compostas por 460 unidades, cada unidade representando um Wickelfeature.
-
-\subsection{Corpus e Metodologia}
-\label{sec:corpus-ffd}
-
-O corpus utilizado para o treinamento dessa rede foi baseado nas informações contidas nos sites \url{https://www.conjugacao.com.br/verbos-irregulares/} e \url{https://www.conjugacao.com.br/verbos-irregulares/}.\\
-
-Primeiramente, foi realizada uma etapa de extração dos verbos e suas respectivas conjugações para um banco de dados local via técnica de \textit{webscraping}. Em seguida, os verbos irregulares foram selecionados manualmente para diferentes famílias. Alguns dos verbos irregulares apontados pela fonte não eram irregulares na conjugação específica de interesse e portanto foram realocados para o grupo de verbos regulares. Em seguida, os verbos foram transcritos manualmente para uma forma pseudo-fonética como demonstrada pela tabela \ref{tab:Tab1}. Dos 423 verbos extraídos, 20 foram considerados verbos sem possível agrupamento (verbos como "ir", "trazer" e "saber"), totalizando uma base de 214 verbos regulares e 209 regulares (50.6\% e 49.4\% respectivamente). A base foi em seguida segmentada entre treino (80\%) e teste (20\%) respeitando-se as proporções intra-classe.  
-
+A rede desenvolvida possui uma camada de Input (Verbos no Infinitivo) e uma de Output (Verbos Flexionados), ambas compostas por 460 unidades, cada unidade representando um Wickelfeature.
 
 \subsection{Hiperparâmetros}
+
+Em redes neurais, existem os parâmetros que são atualizados em decorrência do treinamento (os pesos, por exemplo) e existem parâmetros que devem ser escolhidos antes do treinamento e permanecem fixos. Esse segundo tipo de parâmetro é considerado um \textit{hiperparâmetro}. A escolha dos melhores hiperparâmetros de um modelo de redes neurais é totalmente experimental e envolve uma série de estratégias. Muitas vezes os hiperparâmetros são escolhidos a partir de indicações na literatura ou de colegas pesquisadores que já realizaram experimentos similares. Caso o acesso a tais referências seja limitado por qualquer razão, faz-se necessária a realização de uma série de experimentos a fim de se testar diferentes possibilidades e combinações de hiperparâmetros. Ainda há uma terceira estratégia que é a utilização de algoritmos de busca (Beam Search, por exemplo). Esta pesquisa utilizou-se da primeira e segunda estratégia até o presente momento para a demonstração dos resultados. Alguns dos hiperparâmetros mais importantes são: a função de custo, o otimizador, a função de ativação e o número de épocas. A primeira coisa a ser definida é a função de custo. O aprendizado de uma rede neural ocorre principalmente em decorrência da comparação entre os valores preditos e os valores desejados. Tal diferença pode ser calculada a partir de uma medida de distância e cada tarefa de aprendizado requer uma função de custo apropriada. Nesta pesquisa foi utilizada a função de erros quadráticos médios, que é uma função adequada para o tipo de problema apresentado. Em seguida é necessário escolher um otimizador. O otimizador \textit{Adam} foi escolhido pois aparece na literatura frequentemente associado a essa função de custo. Em seguida, é preciso escolher uma função de ativação. A função de ativação escolhida foi a \textit{Sigmoid} por se tratar da mesma função utilizada pelos pesquisadores Rumelhart e McClelland. Por último, é preciso escolher o número de \textit{Épocas} do treinamento. O número de épocas se refere à quantidade de vezes em que os exemplos passam passam pela rede. Um número de épocas pequeno pode ser insuficiente para o aprendizado e um número de épocas grande pode causar um fenômeno chamado de \textit{overfitting}, aonde a rede adquire um bom desempenho nos exemplos de treinamento porém é incapaz de obter o mesmo desempenho em exemplos novos. Após alguns experimentos com diferentes números, percebeu-se que em até 400 épocas, o modelo apresentava bons resultados e que, a partir desse valor, o aprendizado da rede ficava estagnado.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{ll}
 Loss: & mean squared error \\
 Optimizer: & adam \\
-Activation: & softmax \\
+Activation: & sigmoid \\
 Epochs: & 400 \\
 \end{tabular}
 \caption{Tabela Resumo dos Hiperparâmetros do Modelo FFD}
@@ -179,6 +270,8 @@ O modelo \textbf{Encoder-Decoder 2} foi treinado na base apresentada na Seção 
 
 \subsubsection{Hiperparâmetros} 
 
+
+
 \begin{table}[H]
 \centering
 \begin{tabular}{ll}
@@ -247,231 +340,231 @@ tosi& tusu& surteiu\\
 
 A alteração proporcional no corpus parece ter tornado as predições do modelo Encoder-Decoder um pouco menos arbitrárias, mas ainda é difícil aproximar tais resultados à possível intuição linguística de um falante.  
 
-\subsection{Modelo Encoder-Decoder 3}
+% \subsection{Modelo Encoder-Decoder 3}
  
-\subsubsection{Corpus e Metodologia}
+% \subsubsection{Corpus e Metodologia}
 
-O corpus utilizado para o treinamento das redes \textbf{Encoder-Decoder 3}, \textbf{Encoder-Decoder 4} e \textbf{Encoder-Decoder 5}  foi baseado na lista de verbos disponíveis no site \url{https://www.conjugacao.com.br/verbos-populares/}.\\
+% O corpus utilizado para o treinamento das redes \textbf{Encoder-Decoder 3}, \textbf{Encoder-Decoder 4} e \textbf{Encoder-Decoder 5}  foi baseado na lista de verbos disponíveis no site \url{https://www.conjugacao.com.br/verbos-populares/}.\\
 
-As informações contidas nessa página diferem-se das páginas apresentadas na Seção \ref{sec:corpus-ffd} no sentido de que, em primeiro lugar, não há qualquer divisão entre verbos regulares ou irregulares (o que dificulta a segmentação manual dos verbos em diferentes famílias); apesar disso, ganha-se ao aumentar em quase cem vezes o tamanho da base de treino. 
+% As informações contidas nessa página diferem-se das páginas apresentadas na Seção \ref{sec:corpus-ffd} no sentido de que, em primeiro lugar, não há qualquer divisão entre verbos regulares ou irregulares (o que dificulta a segmentação manual dos verbos em diferentes famílias); apesar disso, ganha-se ao aumentar em quase cem vezes o tamanho da base de treino. 
 
-Assim como na Seção \ref{sec:corpus-ffd}, foi realizada uma etapa de extração dos verbos e suas respectivas conjugações para um banco de dados local. Em seguida, os verbos foram mantidos em notação ortográfica como um exercício de prova de conceito. O objetivo dos testes que se seguem é avaliar o potencial preditivo quando se pode contar com uma base de treinamento consideravelmente maior. Perde-se pela considerável redução de resolução com relação ao reconhecimento de padrões fonológicos, fato que será discutido na Seção \ref{sec:disc}
+% Assim como na Seção \ref{sec:corpus-ffd}, foi realizada uma etapa de extração dos verbos e suas respectivas conjugações para um banco de dados local. Em seguida, os verbos foram mantidos em notação ortográfica como um exercício de prova de conceito. O objetivo dos testes que se seguem é avaliar o potencial preditivo quando se pode contar com uma base de treinamento consideravelmente maior. Perde-se pela considerável redução de resolução com relação ao reconhecimento de padrões fonológicos, fato que será discutido na Seção \ref{sec:disc}
 
-\subsubsection{Hiperparâmetros} 
+% \subsubsection{Hiperparâmetros} 
 
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-Numero de Amostras Treinamento: & 2000 \\
-Numero de Amostras Teste: & 100 \\
-Numero de tokens unicos do Input: & 26 \\
-Numero de tokens unicos do Output: & 32 \\
-Comprimento maximo da sequencia para inputs: & 15 \\
-Comprimento maximo da sequencia para outputs: & 16 \\
-Loss: & categorical\_crossentropy \\
-Optimizer & rmsprop \\
-Activation & softmax \\
-Epochs & 100 \\
-Batch Size & 64
-\end{tabular}
-\caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 3}
-\label{tab:resumo3}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{ll}
+% Numero de Amostras Treinamento: & 2000 \\
+% Numero de Amostras Teste: & 100 \\
+% Numero de tokens unicos do Input: & 26 \\
+% Numero de tokens unicos do Output: & 32 \\
+% Comprimento maximo da sequencia para inputs: & 15 \\
+% Comprimento maximo da sequencia para outputs: & 16 \\
+% Loss: & categorical\_crossentropy \\
+% Optimizer & rmsprop \\
+% Activation & softmax \\
+% Epochs & 100 \\
+% Batch Size & 64
+% \end{tabular}
+% \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 3}
+% \label{tab:resumo3}
+% \end{table}
 
-\subsubsection{Resultados}
-%falar q eu adicionei dropout e explicar oq é isso
+% \subsubsection{Resultados}
+% %falar q eu adicionei dropout e explicar oq é isso
 
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.45\linewidth}
-    \includegraphics[width=\linewidth]{img/enc-dec-3.png}
-    \caption{Resultados de Acurácia por Época}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.45\linewidth}
-    \includegraphics[width=\linewidth]{img/enc-dec-3-loss.png}
-    \caption{Resultados de Custo por Época}
-  \end{subfigure}
-  \caption{Gráficos dos Resultados do Modelo}
-  \label{fig:plots3}
-\end{figure}
+% \begin{figure}[H]
+%   \centering
+%   \begin{subfigure}[b]{0.45\linewidth}
+%     \includegraphics[width=\linewidth]{img/enc-dec-3.png}
+%     \caption{Resultados de Acurácia por Época}
+%   \end{subfigure}
+%   \begin{subfigure}[b]{0.45\linewidth}
+%     \includegraphics[width=\linewidth]{img/enc-dec-3-loss.png}
+%     \caption{Resultados de Custo por Época}
+%   \end{subfigure}
+%   \caption{Gráficos dos Resultados do Modelo}
+%   \label{fig:plots3}
+% \end{figure}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
-100 & 0.380 & 0.471 & 0.115 & 0.440 & 11 min
-\end{tabular}
-\caption{Scores do Modelo Encoder-Decoder 3}
-\label{tab:res-enc-dec-3}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{llllll}
+% \textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+% 100 & 0.380 & 0.471 & 0.115 & 0.440 & 11 min
+% \end{tabular}
+% \caption{Scores do Modelo Encoder-Decoder 3}
+% \label{tab:res-enc-dec-3}
+% \end{table}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{lll}
-\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
-salgar& salgo& salgo\\
-barrar& barro& barro\\
-inquirir& inquiro& inquiro\\
-empobrecer& empobreço& empolero\\
-abreviar& abrevio& abrivejo\\
-folhar& folho& folheio\\
-repudiar& repudio& repudo\\
-desabafar& desabafo& desabaco\\
-estampar& estampo& estamo\\
-filtrar& filtro& filtro\\
-migrar& migro& migro\\
-pilar& pilo& pilo\\
-bolar& bolo& bolo\\
-voltear& volteio& volteio\\
-explicitar& explicito& explico
-\end{tabular}
-\caption{Alguns resultados interessantes do modelo Encoder-Decoder 3}
-\label{tab:res3}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{lll}
+% \textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+% salgar& salgo& salgo\\
+% barrar& barro& barro\\
+% inquirir& inquiro& inquiro\\
+% empobrecer& empobreço& empolero\\
+% abreviar& abrevio& abrivejo\\
+% folhar& folho& folheio\\
+% repudiar& repudio& repudo\\
+% desabafar& desabafo& desabaco\\
+% estampar& estampo& estamo\\
+% filtrar& filtro& filtro\\
+% migrar& migro& migro\\
+% pilar& pilo& pilo\\
+% bolar& bolo& bolo\\
+% voltear& volteio& volteio\\
+% explicitar& explicito& explico
+% \end{tabular}
+% \caption{Alguns resultados interessantes do modelo Encoder-Decoder 3}
+% \label{tab:res3}
+% \end{table}
 
-Nesse modelo foi acrescentada uma técnica de regularização conhecida como Dropout. Essa técnica consiste na inativação aleatória de algumas unidades durante o treinamento para previnir o efeito de overfitting. O modelo de \textbf{Encoder-Decoder 3} exibe previsões mais interessantes que os modelos anteriores. Muitas das predições erraram por apenas uma edição de caracter, mas ainda são erros que falantes provavelmente não cometeriam. No entanto, é natural que a rede perca resolução dado que o nível de treinamento foi alterado de traços fonológicos para caracteres.
+% Nesse modelo foi acrescentada uma técnica de regularização conhecida como Dropout. Essa técnica consiste na inativação aleatória de algumas unidades durante o treinamento para previnir o efeito de overfitting. O modelo de \textbf{Encoder-Decoder 3} exibe previsões mais interessantes que os modelos anteriores. Muitas das predições erraram por apenas uma edição de caracter, mas ainda são erros que falantes provavelmente não cometeriam. No entanto, é natural que a rede perca resolução dado que o nível de treinamento foi alterado de traços fonológicos para caracteres.
 
-\subsection{Modelo Encoder-Decoder 4}
-%Falar que eu quis mudar a funcao de ativacao pra ver oq acontecia e o otimizador tb (deve ter tido uma razao pra eu ter feito isso, deve ta no deep learning la)
+% \subsection{Modelo Encoder-Decoder 4}
+% %Falar que eu quis mudar a funcao de ativacao pra ver oq acontecia e o otimizador tb (deve ter tido uma razao pra eu ter feito isso, deve ta no deep learning la)
 
-\subsubsection{Hiperparâmetros} 
+% \subsubsection{Hiperparâmetros} 
 
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-Numero de Amostras Treinamento: & 2000 \\
-Numero de Amostras Teste: & 100 \\
-Numero de tokens unicos do Input: & 26 \\
-Numero de tokens unicos do Output: & 29 \\
-Comprimento maximo da sequencia para inputs: & 15 \\
-Comprimento maximo da sequencia para outputs: & 16 \\
-Loss: & categorical\_crossentropy \\
-Optimizer & adam \\
-Activation & relu \\
-Epochs & 100 \\
-Batch Size & 64
-\end{tabular}
-\caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 4}
-\label{tab:resumo4}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{ll}
+% Numero de Amostras Treinamento: & 2000 \\
+% Numero de Amostras Teste: & 100 \\
+% Numero de tokens unicos do Input: & 26 \\
+% Numero de tokens unicos do Output: & 29 \\
+% Comprimento maximo da sequencia para inputs: & 15 \\
+% Comprimento maximo da sequencia para outputs: & 16 \\
+% Loss: & categorical\_crossentropy \\
+% Optimizer & adam \\
+% Activation & relu \\
+% Epochs & 100 \\
+% Batch Size & 64
+% \end{tabular}
+% \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 4}
+% \label{tab:resumo4}
+% \end{table}
 
-\subsubsection{Resultados}
+% \subsubsection{Resultados}
 
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.45\linewidth}
-    \includegraphics[width=\linewidth]{img/enc-dec-4.png}
-    \caption{Resultados de Acurácia por Época}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.45\linewidth}
-    \includegraphics[width=\linewidth]{img/enc-dec-4-loss.png}
-    \caption{Resultados de Custo por Época}
-  \end{subfigure}
-  \caption{Gráficos dos Resultados do Modelo}
-  \label{fig:plots4}
-\end{figure}
+% \begin{figure}[H]
+%   \centering
+%   \begin{subfigure}[b]{0.45\linewidth}
+%     \includegraphics[width=\linewidth]{img/enc-dec-4.png}
+%     \caption{Resultados de Acurácia por Época}
+%   \end{subfigure}
+%   \begin{subfigure}[b]{0.45\linewidth}
+%     \includegraphics[width=\linewidth]{img/enc-dec-4-loss.png}
+%     \caption{Resultados de Custo por Época}
+%   \end{subfigure}
+%   \caption{Gráficos dos Resultados do Modelo}
+%   \label{fig:plots4}
+% \end{figure}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
-86 & 0.210 & 1.00 & 0.820 & 0.207 & 10 min
-\end{tabular}
-\caption{Scores do Modelo Encoder-Decoder 4}
-\label{tab:res-enc-dec-4}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{llllll}
+% \textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+% 86 & 0.210 & 1.00 & 0.820 & 0.207 & 10 min
+% \end{tabular}
+% \caption{Scores do Modelo Encoder-Decoder 4}
+% \label{tab:res-enc-dec-4}
+% \end{table}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{lll}
-\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
-raptar& rapto& aso\\
-salgar& salgo& aulo\\
-barrar& barro& aco\\
-urinar& urino& auso\\
-inquirir& inquiro& eino\\
-folhar& folho& o\\
-refutar& refuto& o\\
-cogitar& cogito& aco\\
-\end{tabular}
-\caption{Alguns resultados interessantes do modelo Encoder-Decoder 4}
-\label{tab:res4}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{lll}
+% \textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+% raptar& rapto& aso\\
+% salgar& salgo& aulo\\
+% barrar& barro& aco\\
+% urinar& urino& auso\\
+% inquirir& inquiro& eino\\
+% folhar& folho& o\\
+% refutar& refuto& o\\
+% cogitar& cogito& aco\\
+% \end{tabular}
+% \caption{Alguns resultados interessantes do modelo Encoder-Decoder 4}
+% \label{tab:res4}
+% \end{table}
 
-A alteração da função de ativação da rede não surtiu efeitos muito interessantes. Aparentemente isso tornou os resultados mais arbitrários. Além disso, provavelmente reforçou demasiadamente a probabilidade de um token de final de palavra após o fonema \textbf{o}.
+% A alteração da função de ativação da rede não surtiu efeitos muito interessantes. Aparentemente isso tornou os resultados mais arbitrários. Além disso, provavelmente reforçou demasiadamente a probabilidade de um token de final de palavra após o fonema \textbf{o}.
  
- \subsection{Modelo Encoder-Decoder 5}
-%Falar que eu quis aumentar mais ainda a amostra
+%  \subsection{Modelo Encoder-Decoder 5}
+% %Falar que eu quis aumentar mais ainda a amostra
 
-\subsubsection{Hiperparâmetros} 
+% \subsubsection{Hiperparâmetros} 
 
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-Numero de Amostras Treinamento: & 3000 \\
-Numero de Amostras Teste: & 100 \\
-Numero de tokens unicos do Input: & 26 \\
-Numero de tokens unicos do Output: & 32 \\
-Comprimento maximo da sequencia para inputs: & 15 \\
-Comprimento maximo da sequencia para outputs: & 16 \\
-Loss: & categorical\_crossentropy \\
-Optimizer & rmsprop \\
-Activation & softmax \\
-Epochs & 100 \\
-Batch Size & 64
-\end{tabular}
-\caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 5}
-\label{tab:res5}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{ll}
+% Numero de Amostras Treinamento: & 3000 \\
+% Numero de Amostras Teste: & 100 \\
+% Numero de tokens unicos do Input: & 26 \\
+% Numero de tokens unicos do Output: & 32 \\
+% Comprimento maximo da sequencia para inputs: & 15 \\
+% Comprimento maximo da sequencia para outputs: & 16 \\
+% Loss: & categorical\_crossentropy \\
+% Optimizer & rmsprop \\
+% Activation & softmax \\
+% Epochs & 100 \\
+% Batch Size & 64
+% \end{tabular}
+% \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 5}
+% \label{tab:res5}
+% \end{table}
 
-\subsubsection{Resultados}
+% \subsubsection{Resultados}
 
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.45\linewidth}
-    \includegraphics[width=\linewidth]{img/enc-dec-5.png}
-    \caption{Resultados de Acurácia por Época}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.45\linewidth}
-    \includegraphics[width=\linewidth]{img/enc-dec-5-loss.png}
-    \caption{Resultados de Custo por Época}
-  \end{subfigure}
-  \caption{Gráficos dos Resultados do Modelo}
-  \label{fig:plots5}
-\end{figure}
+% \begin{figure}[H]
+%   \centering
+%   \begin{subfigure}[b]{0.45\linewidth}
+%     \includegraphics[width=\linewidth]{img/enc-dec-5.png}
+%     \caption{Resultados de Acurácia por Época}
+%   \end{subfigure}
+%   \begin{subfigure}[b]{0.45\linewidth}
+%     \includegraphics[width=\linewidth]{img/enc-dec-5-loss.png}
+%     \caption{Resultados de Custo por Época}
+%   \end{subfigure}
+%   \caption{Gráficos dos Resultados do Modelo}
+%   \label{fig:plots5}
+% \end{figure}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
-54 & 0.423 & 0.340 & 0.030 & 0.4789 & 15 min
-\end{tabular}
-\caption{Scores do Modelo Encoder-Decoder 5}
-\label{tab:res-enc-dec-5}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{llllll}
+% \textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+% 54 & 0.423 & 0.340 & 0.030 & 0.4789 & 15 min
+% \end{tabular}
+% \caption{Scores do Modelo Encoder-Decoder 5}
+% \label{tab:res-enc-dec-5}
+% \end{table}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{lll}
-\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
-enxotar& enxoto& enxoto\\
-expiar& expio& expio\\
-pernear& perneio& perenço\\
-propugnar& propugno& propugo\\
-represar& represo& represo\\
-retaliar& retalio& retalio\\
-taralhar& taralho& taralho\\
-amargar& amargo& amargo\\
-arquear& arqueio& arquejo\\
-desarmonizar& desarmonizo& desmarço\\
-esterilizar& esterilizo& estrialeço\\
-potenciar& potencio& potencio
-\end{tabular}
-\caption{Alguns resultados interessantes do modelo Encoder-Decoder 5}
-\label{tab:resumo5}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{lll}
+% \textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+% enxotar& enxoto& enxoto\\
+% expiar& expio& expio\\
+% pernear& perneio& perenço\\
+% propugnar& propugno& propugo\\
+% represar& represo& represo\\
+% retaliar& retalio& retalio\\
+% taralhar& taralho& taralho\\
+% amargar& amargo& amargo\\
+% arquear& arqueio& arquejo\\
+% desarmonizar& desarmonizo& desmarço\\
+% esterilizar& esterilizo& estrialeço\\
+% potenciar& potencio& potencio
+% \end{tabular}
+% \caption{Alguns resultados interessantes do modelo Encoder-Decoder 5}
+% \label{tab:resumo5}
+% \end{table}
 
-Aumentar ainda mais a base de treino ainda não produziu uma acurácia muito alta, porém os resultados parecem mais coerentes do que os resultados dos demais modelos. Na Tabela \ref{tab:res5} verificam-se múltiplos exemplos de predições equivocadas em decorrência de uma edição de caracter.
+% Aumentar ainda mais a base de treino ainda não produziu uma acurácia muito alta, porém os resultados parecem mais coerentes do que os resultados dos demais modelos. Na Tabela \ref{tab:res5} verificam-se múltiplos exemplos de predições equivocadas em decorrência de uma edição de caracter.
 
 \section{Discussão}
 \label{sec:disc}
