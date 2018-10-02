@@ -1,23 +1,26 @@
 \chapter{Resultados Preliminares}
 \label{ch:03-results}
 
+% \epigraph{\itshape Those who cannot remember the past are condemned to compute it.''}{---Steven Pinker, \textit{Words and Rules}}
 % “Language, never forget, is more fashion than science, and matters of usage, spelling and pronunciation tend to wander around like hemlines.” 
 % ― Bill Bryson, The Mother Tongue: English and How It Got That Way
 
-Neste capítulo serão discutidos resultados de múltiplos experimentos realizados a partir de diferentes tipos de modelagem de redes neurais. A primeira delas, baseada na pesquisa de Rumelhart e McClelland e discutida na Seção \ref{sec:arqFDD}.
-A segunda, o modelo de Encoder-Decoder discutido na seção \ref{sec:enc-dec}. Para cada um destes experimentos, subdividem-se seus respectivos corpus entre treino (80\%) e validação (20\%). Essa partição tem como objetivo direcionar o modelo para um melhor desempenho diante de dados novos. Resultados de predições sobre alguns verbos da base de teste são exibidos no Apêndice. 
+Neste capítulo serão discutidos resultados de múltiplos experimentos realizados a partir de diferentes tipos de modelagem de redes neurais. A primeira delas, baseada na pesquisa de Rumelhart e McClelland e discutida na Seção \ref{sec:arqFDD} e nomeada de FDD.
+A segunda, o modelo de Encoder-Decoder discutido na seção \ref{sec:enc-dec}. Os resultados das predições estão disponíveis em: 
+\url{https://github.com/beatrizalbiero/MsResearch} nas seções \textbf{Wickelfeatures Net Results} e \textbf{Encoder-Decoder}.
+
 
 \section{Rede FFD}
 \label{sec:ffd}
 
 A rede desenvolvida possui uma camada de Input e uma de Output, ambas compostas por 460 unidades, cada unidade representando um Wickelfeature.
 
-\subsection{Corpus}
+\subsection{Corpus e Metodologia}
 \label{sec:corpus-ffd}
 
 O corpus utilizado para o treinamento dessa rede foi baseado nas informações contidas nos sites \url{https://www.conjugacao.com.br/verbos-irregulares/} e \url{https://www.conjugacao.com.br/verbos-irregulares/}.\\
 
-Primeiramente, foi realizada uma etapa de extração dos verbos e suas respectivas conjugações para um banco de dados local via técnica de \textit{webscraping}. Em seguida, os verbos irregulares foram selecionados manualmente para diferentes famílias. Alguns dos verbos irregulares apontados pela fonte não eram irregulares na conjugação específica de interesse e portanto foram realocados para o grupo de verbos regulares. Em seguida, os verbos foram transcritos manualmente para uma forma pseudo-fonética como demonstrada pela tabela \ref{tab:Tab1}. Dos 423 verbos extraídos, 20 foram considerados verbos sem possível agrupamento (verbos como "ir", "trazer" e "saber"), totalizando uma base de 214 verbos regulares e 209 regulares (50.59\% e 49.40\% respectivamente). A base foi em seguida segmentada entre treino (80\%) e teste (20\%) respeitando-se as proporções intra-classe.  
+Primeiramente, foi realizada uma etapa de extração dos verbos e suas respectivas conjugações para um banco de dados local via técnica de \textit{webscraping}. Em seguida, os verbos irregulares foram selecionados manualmente para diferentes famílias. Alguns dos verbos irregulares apontados pela fonte não eram irregulares na conjugação específica de interesse e portanto foram realocados para o grupo de verbos regulares. Em seguida, os verbos foram transcritos manualmente para uma forma pseudo-fonética como demonstrada pela tabela \ref{tab:Tab1}. Dos 423 verbos extraídos, 20 foram considerados verbos sem possível agrupamento (verbos como "ir", "trazer" e "saber"), totalizando uma base de 214 verbos regulares e 209 regulares (50.6\% e 49.4\% respectivamente). A base foi em seguida segmentada entre treino (80\%) e teste (20\%) respeitando-se as proporções intra-classe.  
 
 
 \subsection{Hiperparâmetros}
@@ -30,8 +33,8 @@ Optimizer: & adam \\
 Activation: & softmax \\
 Epochs: & 400 \\
 \end{tabular}
-\caption{Tabela Resumo Estrutural do Modelo FFD}
-\label{tab:res1}
+\caption{Tabela Resumo dos Hiperparâmetros do Modelo FFD}
+\label{tab:resumo1}
 \end{table}
 
 \subsection{Resultados}
@@ -49,10 +52,34 @@ O modelo FFD foi treinado em diferentes bases com diferentes arranjos proporcion
 \label{tab:resultadosfdd}
 \end{table}
 
+Com relação ao comportamento do modelo, 50\% dos verbos irregulares foram regularizados, ou seja, o modelo falhou em perceber a relação destes com os demais verbos irregulares de mesma família presentes no treinamento. Outro fato importante a ser mencionado é que falhou na decodificação de Wickelfeatures em 5 casos, justamente verbos de sequências maiores. Também é importante notar que dois casos foram observados em que o modelo foi capaz de prever o processo de inflexão irregular apesar de falhar em decodificar os fonemas centrais das palavras.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llll}
+\textbf{Verb} & \textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+pegar & \#pega\# & \#pEgu\# & \#pEku\# \\
+cegar & \#sega\# & \#sEgu\# & \#sigu\# \\
+secar & \#seka\# & \#sEku\# & \#siku\# \\
+levar & \#leva\# & \#lEvu\# & \#levu\# \\
+orar & \#ora\# & \#Oru\# & \#earu\# \\
+morar & \#mora\# & \#mOru\# & \#mEru\# \\
+postar & \#posta\# & \#pOstu\# & \#pOtu\#* \\
+mentir & \#menti\# & \#mintu\# & \#mitu\#* \\
+tossir & \#tosi\# & \#tusu\# & \#tutu\# \\
+fazer & \#faze\# & \#fasu\# & \#fasu\# \\
+matar & \#mata\# & \#matu\# & \#matu\# \\
+pagar & \#paga\# & \#pagu\# & \#pagu\# \\
+\#sair\# & \#sai\# & \#saiu\# & \#saiu\#
+\end{tabular}
+\caption{Alguns resultados interessantes do modelo FFD}
+\label{tab:res}
+\end{table}
+
 \section{Encoder-Decoder}
 \label{sec:seq2seq}
 
-Como discutido na Seção \ref{sec:enc-dec}, os modelos do tipo Encoder-Decoder parecem promissores para o alcance dos objetivos propostos. Nessa seção são discutidos e comparados alguns testes que exibem a mesma arquitetura (Fig. \ref{fig:encdec}), porém alteram-se alguns dos hiperparâmetros possíveis e testam-se também bases de diferentes comprimentos.
+Como discutido na Seção \ref{sec:enc-dec}, os modelos do tipo Encoder-Decoder parecem promissores para o alcance dos objetivos propostos dada a dificuldade encontrada na decodificação de longas sequências. %Nessa seção são discutidos e comparados alguns testes relacionados à mesma arquitetura (Fig. \ref{fig:encdec}), porém alteram-se alguns dos hiperparâmetros possíveis e testam-se também bases de diferentes comprimentos.
 
 A camada de Input do Encoder é inicializada a partir do tamanho do vocabulário. Nesse caso, considera-se vocabulário o número de caracteres únicos contidos na base de treinamento para a forma infinitiva dos verbos. Na camada de Input do Decoder, equivalentemente, o vocabulário da forma verbal conjugada.
 %incluir ref Keras
@@ -93,7 +120,7 @@ Epochs & 130 \\
 Batch Size & 64
 \end{tabular}
 \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 1}
-\label{tab:res1}
+\label{tab:resumo2}
 \end{table}
 
 \subsubsection{Resultados}
@@ -115,12 +142,35 @@ Batch Size & 64
 \begin{table}[H]
 \centering
 \begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Vall\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
 97 & 0.342 & 0.867 & 0.290 & 0.508 & 2 min
 \end{tabular}
 \caption{Scores do Modelo Encoder-Decoder 1}
 \label{tab:res-enc-dec-1}
 \end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+segir& sigu& siriu\\
+hepeti& hepitu& hespeniu\\
+dete& deteniu& desiru\\
+te& teniu& teniu\\
+protesta& protEstu& proteiu\\
+espera& espEru& esprEsu\\
+pega& pEgu& pEsu\\
+sega& sEgu& sEsu\\
+preve& preveju& previnu\\
+vi& veniu& viju\\
+adivi& adiveniu& aiijasu\\
+junta& juntu& jugu\\
+\end{tabular}
+\caption{Alguns resultados interessantes do modelo Encoder-Decoder 1}
+\label{tab:res1}
+\end{table}
+
+O modelo \textbf{Encoder-Decoder 1} apesar de ter mais facilidade na predição de sequências longas apresentou resultados inferiores ao modelo \textbf{FFD}. A Tabela \ref{tab:res1} exibe uma série de predições que seriam consideradas sem nexo para falantes. Apesar disso, é possível notar que a rede foi capaz de relacionar alguns verbos do teste com suas respectivas famílias irregulares. Os verbos 'pegar' e 'esperar' por exemplo foram associados corretamente às suas respectivas famílias apesar de terem sido conjugados de forma equivocada.
 
 \subsection{Modelo Encoder-Decoder 2}
 
@@ -145,7 +195,7 @@ Epochs & 150 \\
 Batch Size & 64
 \end{tabular}
 \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 2}
-\label{tab:res1}
+\label{tab:resumo21}
 \end{table}
 
 \subsubsection{Resultados}
@@ -167,16 +217,39 @@ Batch Size & 64
 \begin{table}[H]
 \centering
 \begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Vall\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
 145 & 0.419 & 1.048 & 0.014 & 0.644 & 4 min
 \end{tabular}
 \caption{Scores do Modelo Encoder-Decoder 2}
 \label{tab:res-enc-dec-2}
 \end{table}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+seka& sEku& sugu \\
+leva& lEvu& levu \\
+ora& Oru& bOtu\\
+mora& mOru& omupu\\
+posta& pOstu& postu\\
+joga& jOgu& ju\\
+sortia& sorteiu& surtu\\
+media& medeiu& medeiu\\
+kompo& komponiu& kompou\\
+po& poniu& poveiniu\\
+menti& mintu& mintu\\
+tosi& tusu& surteiu\\
+\end{tabular}
+\caption{Alguns resultados interessantes do modelo Encoder-Decoder 2}
+\label{tab:res2}
+\end{table}
+
+A alteração proporcional no corpus parece ter tornado as predições do modelo Encoder-Decoder um pouco menos arbitrárias, mas ainda é difícil aproximar tais resultados à possível intuição linguística de um falante.  
+
 \subsection{Modelo Encoder-Decoder 3}
  
-\subsubsection{Corpus}
+\subsubsection{Corpus e Metodologia}
 
 O corpus utilizado para o treinamento das redes \textbf{Encoder-Decoder 3}, \textbf{Encoder-Decoder 4} e \textbf{Encoder-Decoder 5}  foi baseado na lista de verbos disponíveis no site \url{https://www.conjugacao.com.br/verbos-populares/}.\\
 
@@ -202,7 +275,7 @@ Epochs & 100 \\
 Batch Size & 64
 \end{tabular}
 \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 3}
-\label{tab:res3}
+\label{tab:resumo3}
 \end{table}
 
 \subsubsection{Resultados}
@@ -225,12 +298,38 @@ Batch Size & 64
 \begin{table}[H]
 \centering
 \begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Vall\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
 100 & 0.380 & 0.471 & 0.115 & 0.440 & 11 min
 \end{tabular}
 \caption{Scores do Modelo Encoder-Decoder 3}
 \label{tab:res-enc-dec-3}
 \end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+salgar& salgo& salgo\\
+barrar& barro& barro\\
+inquirir& inquiro& inquiro\\
+empobrecer& empobreço& empolero\\
+abreviar& abrevio& abrivejo\\
+folhar& folho& folheio\\
+repudiar& repudio& repudo\\
+desabafar& desabafo& desabaco\\
+estampar& estampo& estamo\\
+filtrar& filtro& filtro\\
+migrar& migro& migro\\
+pilar& pilo& pilo\\
+bolar& bolo& bolo\\
+voltear& volteio& volteio\\
+explicitar& explicito& explico
+\end{tabular}
+\caption{Alguns resultados interessantes do modelo Encoder-Decoder 3}
+\label{tab:res3}
+\end{table}
+
+Nesse modelo foi acrescentada uma técnica de regularização conhecida como Dropout. Essa técnica consiste na inativação aleatória de algumas unidades durante o treinamento para previnir o efeito de overfitting. O modelo de \textbf{Encoder-Decoder 3} exibe previsões mais interessantes que os modelos anteriores. Muitas das predições erraram por apenas uma edição de caracter, mas ainda são erros que falantes provavelmente não cometeriam. No entanto, é natural que a rede perca resolução dado que o nível de treinamento foi alterado de traços fonológicos para caracteres.
 
 \subsection{Modelo Encoder-Decoder 4}
 %Falar que eu quis mudar a funcao de ativacao pra ver oq acontecia e o otimizador tb (deve ter tido uma razao pra eu ter feito isso, deve ta no deep learning la)
@@ -253,11 +352,10 @@ Epochs & 100 \\
 Batch Size & 64
 \end{tabular}
 \caption{Tabela Resumo Estrutural do Modelo Encoder-Decoder 4}
-\label{tab:res4}
+\label{tab:resumo4}
 \end{table}
 
 \subsubsection{Resultados}
-%falar q eu adicionei dropout e explicar oq é isso
 
 \begin{figure}[H]
   \centering
@@ -276,13 +374,31 @@ Batch Size & 64
 \begin{table}[H]
 \centering
 \begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Vall\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
 86 & 0.210 & 1.00 & 0.820 & 0.207 & 10 min
 \end{tabular}
 \caption{Scores do Modelo Encoder-Decoder 4}
 \label{tab:res-enc-dec-4}
 \end{table}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+raptar& rapto& aso\\
+salgar& salgo& aulo\\
+barrar& barro& aco\\
+urinar& urino& auso\\
+inquirir& inquiro& eino\\
+folhar& folho& o\\
+refutar& refuto& o\\
+cogitar& cogito& aco\\
+\end{tabular}
+\caption{Alguns resultados interessantes do modelo Encoder-Decoder 4}
+\label{tab:res4}
+\end{table}
+
+A alteração da função de ativação da rede não surtiu efeitos muito interessantes. Aparentemente isso tornou os resultados mais arbitrários. Além disso, provavelmente reforçou demasiadamente a probabilidade de um token de final de palavra após o fonema \textbf{o}.
  
  \subsection{Modelo Encoder-Decoder 5}
 %Falar que eu quis aumentar mais ainda a amostra
@@ -309,7 +425,6 @@ Batch Size & 64
 \end{table}
 
 \subsubsection{Resultados}
-%falar q eu ainda nao adicionei o dropout mas pode ser legal adicionar
 
 \begin{figure}[H]
   \centering
@@ -328,22 +443,44 @@ Batch Size & 64
 \begin{table}[H]
 \centering
 \begin{tabular}{llllll}
-\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Vall\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
+\textbf{Best Epoch Score} & \textbf{Val\_Acc} & \textbf{Val\_Loss} & \textbf{Loss} & \textbf{Acc} & \textbf{Time} \\
 54 & 0.423 & 0.340 & 0.030 & 0.4789 & 15 min
 \end{tabular}
 \caption{Scores do Modelo Encoder-Decoder 5}
 \label{tab:res-enc-dec-5}
 \end{table}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\textbf{Input} & \textbf{Expected} & \textbf{Output} \\ \hline
+enxotar& enxoto& enxoto\\
+expiar& expio& expio\\
+pernear& perneio& perenço\\
+propugnar& propugno& propugo\\
+represar& represo& represo\\
+retaliar& retalio& retalio\\
+taralhar& taralho& taralho\\
+amargar& amargo& amargo\\
+arquear& arqueio& arquejo\\
+desarmonizar& desarmonizo& desmarço\\
+esterilizar& esterilizo& estrialeço\\
+potenciar& potencio& potencio
+\end{tabular}
+\caption{Alguns resultados interessantes do modelo Encoder-Decoder 5}
+\label{tab:resumo5}
+\end{table}
+
+Aumentar ainda mais a base de treino ainda não produziu uma acurácia muito alta, porém os resultados parecem mais coerentes do que os resultados dos demais modelos. Na Tabela \ref{tab:res5} verificam-se múltiplos exemplos de predições equivocadas em decorrência de uma edição de caracter.
+
 \section{Discussão}
 \label{sec:disc}
 
-Na Tabela \ref{tab:resultadosfdd} observa-se que aparentemente não há qualquer relação entre a proporção de verbos irregulares na base de treino e a acurácia do modelo. A acurácia foi cálculada a partir de uma base de teste em que considera-se um acerto apenas quando a sequência predita corresponde exatamente à sequência esperada. Apesar da variação percentual ser grande, os modelos podem ser considerados similares pois a base de teste era de apenas 21 verbos e uma predição incorreta de uma única conjugação significa uma perda de 4.76\% na acurácia. Tal variação pode ter ocorrido em decorrência da inicialização aleatória dos pesos. Com relação à métrica \textit{Loss}, observa-se que há alguma relação entre o aumento da proporção de verbos irregulares e a sua respectiva diminuição. Isso indica que a maior presença destes verbos ajudou, ainda que minimamente, na redução do erro quadrático médio. Essa redução não se converteu em ganho considerável de acurácia provavelmente pelo fato de que não houve aumento no número de exemplos distintos de verbos irregulares, somente no número de vezes que um mesmo verbo passou pelo treinamento. Isto pode ter provocado um \textit{underfitting} nos dados.
+Na Tabela \ref{tab:resultadosfdd} observa-se que aparentemente não há qualquer relação entre a proporção de verbos irregulares na base de treino e a acurácia do modelo. A acurácia foi cálculada a partir de uma base de teste em que considera-se um acerto apenas quando a sequência predita corresponde exatamente à sequência esperada. Apesar da variação percentual ser grande, os modelos podem ser considerados similares pois a base de teste era de apenas 21 verbos e uma predição incorreta de uma única conjugação significa uma perda de 4.76\% na acurácia. Com relação à métrica \textit{Loss}, observa-se que há alguma relação entre o aumento da proporção de verbos irregulares e a sua respectiva diminuição. Isso indica que a maior presença destes verbos ajudou, ainda que minimamente, na redução do erro quadrático médio. Essa redução não se converteu em ganho considerável de acurácia provavelmente pelo fato de que não houve aumento no número de exemplos distintos de verbos irregulares, somente no número de vezes que um mesmo verbo passou pelo treinamento. Isto pode ter provocado um \textit{underfitting} nos dados.
 
-Os modelos Encoder-Decoder foram considerados principalmente pela independência das funções de decodificação para sequências. O cálculo recursivo a nível de caracter utilizando as LSTM's elimina o problema apontado na Seção \ref{sec:dec}. No entanto, como verificado nas figuras \ref{fig:plots1} e \ref{fig:plots2}, a grande distância entre a acurácia de treino e validação ainda indica \textit{underfitting}. Por essa razão, viu-se necessário o aumento da base de treino e o acréscimo de uma camada de \textit{Dropout}\footnote{Dropout é uma técnica de regularização que inativa aleatóriamente algumas unidades durante o treinamento. %ref
-} = 0.25. Os resultados do modelo \textbf{Encoder-Decoder 3} (Fig. \ref{fig:plots3}) treinados em 2000 verbos distintos indicam redução notável na diferença entre os resultados obtidos para teste e validação. Ainda que tais resultados sejam inferiores aos obtidos pelos modelos \textbf{Encoder-Decoder 1} e \textbf{Encoder-Decoder 2}, deve-se lembrar que houve redução de resolução e acréscimo de features, uma vez que a base de treino é composta por verbos em notação ortográfica e não fonética. 
+Os modelos Encoder-Decoder foram adotados principalmente pela independência das funções de decodificação para sequências. O cálculo recursivo a nível de caracter utilizando as LSTM's elimina o problema apontado na Seção \ref{sec:dec}. No entanto, como verificado nas figuras \ref{fig:plots1} e \ref{fig:plots2}, a grande distância entre a acurácia de treino e validação ainda indica \textit{underfitting}. Os resultados do modelo \textbf{Encoder-Decoder 3} (Fig. \ref{fig:plots3}) treinados em 2000 verbos distintos indicam redução notável na diferença entre os resultados obtidos para teste e validação. Ainda que tais resultados sejam inferiores aos obtidos pelos modelos \textbf{Encoder-Decoder 1} e \textbf{Encoder-Decoder 2}, deve-se lembrar que houve redução de resolução e acréscimo de features, uma vez que a base de treino é composta por verbos em notação ortográfica e não fonética. 
 
-O modelo \textbf{Encoder-Decoder 4} foi desenvolvido com o objetivo de se testar uma diferente função de ativação. De acordo com %deeplearning tal tal
+O modelo \textbf{Encoder-Decoder 4} foi desenvolvido com o objetivo de se testar uma diferente função de ativação. De acordo com \cite{Goodfellow-et-al-2016}
 , sugere-se a utilização do otimizador "Adam" em conjunto com a função de ativação "RELU". Os resultados exibidos na Figura \ref{fig:plots4} demonstram um aprendizado completamente instável e fraco. 
 
 Por último, o modelo \textbf{Encoder-Decoder 5} foi treinado em uma base de 3000 verbos distintos sem camada de Dropout e conseguiu o melhor resultado de acurácia (0.423) para o grupo de validação entre os modelos dessa mesma arquitetura. Com relação à outra arquitetura (FDD), a comparação torna-se de certa forma injusta pois, em primeiro lugar, a rede FDD é incapaz de gerar sequências maiores que quatro caracteres como discutido na Seção \ref{sec:dec}. Em segundo lugar, as bases de teste aplicadas são distintas: A base de teste da FFD é 30 vezes menor e é mais controlada com relação às irregularidades presentes.\\

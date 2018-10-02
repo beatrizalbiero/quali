@@ -1,55 +1,60 @@
 \chapter{Introdução a Redes Neurais}
 \label{ch:02-background}
 
-%\epigraph{Those who cannot remember the past are condemned to compute it.}{\textit{Steven Pinker}}
-\epigraph{\itshape Those who cannot remember the past are condemned to compute it.''}{---Steven Pinker, \textit{Words and Rules}}
+
+% \epigraph{\itshape Those who cannot remember the past are condemned to compute it.''}{---Steven Pinker, \textit{Words and Rules}}
 
 \section{Redes Neurais}
 
 Uma rede neural é, essencialmente, um modelo de aprendizado de máquina supervisionado %[ref] 
-que está a procura de aprender \textit{padrões}. A inspiração para o desenvolvimento desse tipo de modelagem surgiu a partir de estudos em neurosciência %[ref] 
-que concluiram que, diante de múltiplas apresentações de um mesmo estímulo, um mesmo grupo de neurônios sofre incitação e dispara%[ref david hubel ]
-.  Analogamente, o modelo artificial é composto por uma camada de \textit{input} (um vetor) que recebe diferentes estímulos (\textit{features}). A informação recebida é processada e distribuída ao longo de múltiplas conexões com a próxima camada. Tais conexões são representadas por uma matriz \textbf{W} de pesos que passa por uma função de ativação\footnote{Diferentes funções de ativação podem ser utilizadas, como por exemplo a Softmax, a RELU, a Tanh ou a própria Sigmoid apresentada no texto.}. A função de ativação aqui, funciona como uma forma de administração dos disparos dos neurônios, de modo a condicionar a probabilidade de disparo à equação \ref{eq:sigmoid}. Também é uma maneira de garantir ao sistema a produção de diferentes respostas para padrões diferentes utilizando a mesma rede. Além disso, permite com que o aprendizado ocorra de forma gradual, de modo que o efeito de estímulos passados ainda perdure por um longo período mesmo após a apresentação de novos estímulos 
+que está a procura de aprender \textit{padrões}. Um modelo de aprendizado de máquina é uma tarefa computacional que explora algoritmos que podem aprender a partir de seus erros e fazer previsões sobre dados. A principal característica desse tipo de modelo é o caráter indutivo dos algoritmos, em oposição aos dedutivos. Esse tipo de algoritmo é normalmente inicializado com nenhuma expectativa sobre a tarefa que deve realizar e busca informações exclusivamente a partir dos dados do problema. Os possíveis tipos de aprendizado de máquina são divididos entre: \textit{supervisionados}, \textit{não-supervisionados} %ref
+e por \textit{reforço}. %ref
+No caso das redes neurais, o aprendizado diz-se supervisionado, pois informa-se à rede o \textit{output} esperado pelo treinamento.
+
+A inspiração para o desenvolvimento desse tipo de modelagem surgiu a partir de estudos em neurosciência %[ref] 
+que concluiram que, diante de múltiplas apresentações de um mesmo estímulo, um mesmo grupo de neurônios sofre incitação e dispara (\cite{hubel:1962}).  Analogamente, o modelo artificial é composto por uma camada de \textit{input} que recebe diferentes estímulos (representados em \ref{eq:sigmoid} por $\vect{x}$; vetores numéricos que representam o objeto a ser analisado). A informação recebida é distribuída ao longo de múltiplas conexões com a próxima camada através de uma múltiplicação com uma matriz de pesos $\vect{W}$. A matriz de pesos funciona como uma analogia às conexões existentes entre neurônios de modo que um peso maior representa uma conexão que deve ser reforçada e um peso menor representa uma conexão que deve ser reprimida. Além disso, é importante que o sistema de aprendizado não seja demasiado sensível a todo \textit{input} que receber, pois nesse caso cada \textit{input} diferente recebido alteraria completamente o modelo impossibilitando um aprendizado generalizado. Como solução, o resultado obtido a partir da multiplicação dos pesos pelos \textit{inputs} entra como argumento em uma função de ativação. A função de ativação é uma função que simula o potencial energético existente nas conexões neurais e permite que uma unidade apenas seja ativada caso o resultado dessa função atinja um \textit{threshold} mínimo. Isso permite ao sistema a produção de diferentes respostas para padrões diferentes utilizando a mesma rede e além disso, permite com que o aprendizado ocorra de forma gradual, de modo que o efeito de estímulos passados ainda perdure por um longo período mesmo após a apresentação de novos estímulos.
 \input{tikz/sigmoid_plot.tex}
-(Fig. \ref{fig:sigmoidplot}). Após essa transformação, o resultado serve como novo input para a próxima camada e assim sucessivamente até a última, a camada de \textit{output}.
+
+Uma das funções mais utilizadas na literatura é a função \textit{sigmoid}, uma função suave, diferenciável e facilmente interpretável (Fig. \ref{fig:sigmoidplot}). 
+
+Após essa transformação, o resultado serve como novo input para a próxima camada e assim sucessivamente até a última, a camada de \textit{output}. Todas as camadas existentes entre as camadas de \textit{input} e de \textit{output} são chamadas de \textit{camadas escondidas} (Ver Fig. \ref{fig:ffd}.)
 
 \begin{align}\label{eq:sigmoid}
-p(w_{i} = 1) = \frac{1}{1+e^{\sum_{i} w_{i}x_{i} + b}}
+p(w_{i} = 1) = \frac{1}{1+e^{\sum_{i} w_{i}x_{i}}}
 \end{align}
 
 Algebricamente, pode-se representar o processo descrito através da composição de múltiplas funções, uma vez que o resultado das operações precedentes servirão como entrada para as próximas camadas.
 
 \begin{align}
-f(\vect{x}; \vect{\theta}) &= f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1, \vect{b}_1); \vect{W}_2, \vect{b}_2)\\
-&= \sigma(\vect{W}_2 (\sigma(\vect{W}_1\vect{x} + \vect{b}_1)) + \vect{b}_2)
+f(\vect{x}) &= f^{(2)}(f^{(1)}(\vect{x}; \vect{W}_1); \vect{W}_2)\\
+&= \sigma(\vect{W}_2 (\sigma(\vect{W}_1\vect{x})))
 \end{align}
+
+\input{tikz/ffd-generic.tex}
 
 \subsection{Treinamento}
 
-Para que a rede seja capaz de identificar os padrões desejados, é necessário alimentá-la com o que se espera como resposta (\textit{targets}), pois o treinamento da mesma consiste, essencialmente, na atualização das matrizes de pesos que deve ocorrer a partir da comparação entre os valores previstos pela rede (\textit{outputs}) e os \textit{targets}. A comparação entre esses valores se dá por meio de uma função de custo (\textit{Loss Function}), que representa uma forma de se quantificar o quão perto se está de uma rede ideal em que os outputs correspondam exatamente aos targets. Nesse sentido, encontrar o mínimo desta função significa também encontrar os melhores pesos para o aprendizado da tarefa em questão.
-%colocar a referencia do Deep Learning, a practioneers approach
+Para que a rede seja capaz de identificar os padrões desejados, é necessário alimentá-la com o que se espera como resposta (\textit{targets}), pois o treinamento da mesma consiste, essencialmente, na atualização das matrizes de pesos que deve ocorrer a partir da comparação entre os valores previstos pela rede (\textit{outputs}) e os \textit{targets}. A comparação entre esses valores se dá por meio de uma função de custo (\textit{Loss Function}), que representa uma forma de se quantificar o quão perto se está de uma rede ideal em que os resultados previstos correspondam exatamente aos \textit{targets}. O objetivo do aprendizado da rede é minimizar essa diferença, ou seja, encontrar o mínimo da função de custo (\cite{josh:2017}). Após a exposição a um certo número de exemplos, todos os pesos são atualizados simultaneamente com os valores que em conjunto minimizam a função de custo e portanto aproximam as previsões da rede aos \textit{targets}. %ref
 
-\section{Modelo Apresentado pelos Pesquisadores Rumelhart e McClelland (1986)}
+\section{Modelo Apresentado em Rumelhart e McClelland (1986)}
 \label{sec:arqFDD}
 
-O esquema apresentado pelos pesquisadores Rumelhart e McClelland represetado na Fig. \ref{fig:esquemafdd} é conhecido como uma arquitetura do tipo \textit{Feed-Forward-Network (FFD)} porém sem camadas intermediárias. Nesse caso, todos os nódulos da camada de input se conectam diretamente aos nódulos da camada de output.
+O esquema apresentado pelos pesquisadores Rumelhart e McClelland represetado na Fig. \ref{fig:esquemafdd} é conhecido como uma arquitetura do tipo \textit{Feed-Forward-Network (FFD)} sem camadas escondidas. Nesse caso, todos os nódulos da camada de input se conectam diretamente aos nódulos da camada de output.
 
-Por se tratarem de dados linguísticos (caracteres), os pesquisadores apresentam a codificação dos fonemas em representações vetoriais, introduzindo portanto a noção de \textit{Wickelfeatures}.
+Para uma melhor compreensão com relação à rede introduzida pelos autores, é necessário entender primeiramente o pré-processamento utilizado nos dados do treinamento, isto é, a análise dos verbos irregulares em unidades vetoriais simplificadas que alimentam o modelo computacional. Para tanto, é necessária a compreensão de um conceito introduzido pelos pesquisadores, o conceito de \textit{Wickelfeature}.
 
 \subsection{Wickelfeatures}
 \label{sec:wickelfeatures}
-Como descrito na Seção \ref{ch:01-introduction}, as unidades de input e output correspondem às features fonéticas que caracterizam os verbos no tempo presente. Rumelhart e McClelland propõe a caracterização de cada fonema como uma combinação de features em apenas 4 dimensões. O fonema \textit{d}, por exemplo, é caracterizado por um conjunto de 4 features: Consoante Interrompida, Vozeada, - e -. %Stop ? e Middle?.
-Nesse sentido, os pesquisadores apresentam uma tabela que codifica cada fonema na língua inglesa às quatro dimensões de features. A Tabela \ref{tab:Tab1} foi baseada nesse sistema de codificação, porém simplificado e adaptado para o português brasileiro. A primeira dimensão da tabela divide os fonemas em três grandes grupos: consoantes interrompidas, continuadas ou vogais. A segunda dimensão aumenta o grau de resolução da primeira e ainda as divide em stops e nasais, %ver traducoes
-fricativas e líquidas, altas e baixas. A terceira dimensão classifica os fonemas de acordo com três simples pontos de articulação: Frontal, Média ou Back. %ver traducao para Back.
-A quarta dimensão subcategoriza as consoantes em vozeadas vs. não-vozeadas e as vogais em longas e curtas. A presença de cada uma destas features em um determinado fonema recebe o valor $1$, enquanto que a ausência, $0$.
-Com base na tabela %ref
-portanto, o fonema \textit{d} passa a ser representado pelo vetor:
+Os pesquisadores Rumelhart e McClelland propõem a caracterização de cada fonema como uma combinação simplificada de atributos em apenas 4 dimensões. O fonema \textit{d}, por exemplo, é caracterizado por um conjunto de 4 atributos: "Int.", indicando que é uma consoante interrompida; "V", indicando a vibração das cordas vocais; "Oclusi."  indicando que é uma consoante oclusiva; e "Média" por se tratar de um fonema produzido em ponto de articulação central. Seguindo este raciocínio para uma representação simplificada dos fonemas, os pesquisadores apresentam uma tabela que codifica cada fonema na língua inglesa às quatro dimensões de atributos. A Tabela \ref{tab:Tab1} foi baseada nesse sistema de codificação, porém com algumas adaptações para o português brasileiro. A tabela original apresentada pelos autores pode ser consultada no Apêndice (\ref{ch:07-appendice}. A primeira dimensão da tabela divide os fonemas em três grandes grupos: consoantes interrompidas, continuadas ou vogais. Dentre as consoantes interrompidas, encontram-se as consoantes oclusivas e nasais. Vê-se que nem todos os fonemas da tabela internacional (\ref{tab:ipa1} e \ref{tab:ipa2}) foram mapeados, apenas os mais importantes para a língua. Com relação às consoantes continuadas, estas foram subdivididas entre fricativas e líquidas (a versão dos autores ainda agrupava semi-vogais às líquidas). Ainda nesta dimensão, as vogais foram simplificadas a apenas altas ou baixas.  Com relação ao ponto de articulação (terceira dimensão), os autores agruparam bilabiais e labio-dentais em um único atributo entitulado de "anterior". Dentais e alveolares são consideradas consoantes com ponto de articulação médio. Pós-alveolares em diante são consideradas posteriores. A quarta dimensão subcategoriza as consoantes em vozeadas (V) vs. não-vozeadas (U) e as vogais em longas (L) e curtas (S). No caso da língua portuguesa não ocorre essa distinção entre as vogais, portanto essa dimensão é utilizada apenas para a dinstinção das vogais entre abertas e fechadas. No caso da vogal "u", ela representava a vogal curta associada à palavra \textit{book} (/buk/) e foi mantida nessa mesma posição.
+
+A presença de cada um destes atributos em cada dimensão para um determinado fonema recebe o valor $1$, enquanto que a ausência, $0$. A primeira dimensão diz respeito à ordem Int - Cont - Vogal e um fonema é associado a um único atributo desta dimensão, ou seja, se o fonema for uma consoante interrompida, ele deve ser representado pelo vetor (100), se o fonema for uma consoante continuada, deve ser representado pelo vetor (010) e se for vogal, pelo vetor (001). O mesmo serve para as demais dimensões, sendo que a ordem da segunda é: Ocl - Nasal (dado que a primeira dimensão é uma consoante interrompida); Fricat - Liq (dado que a primeira dimensão é uma consoante continuada) ou Alta - Baixa caso a primeira dimensão aponte para uma vogal. Em seguida a terceira dimensão diz respeito à ordem: Anterior - Médio - Posterior. Por último, a interpretação da quarta dimensão também está condicionada à primeira dimensão, ou seja, caso o fonema seja uma consoante ele pode ser vozeado ou não-vozeado; caso seja uma vogal, longa ou curta. 
+Com base na Tabela \ref{tab:Tab1}, portanto, o fonema \textit{d} passa a ser representado pelo vetor \ref{fond}. Cada sequência contida entre parênteses representa uma dimensão e os números dentro dela representam o atributo deste fonema nesta respectiva dimensão.
 
 \begin{align}
-d \Rightarrow (100)(10)(010)(10)
+d \Rightarrow (100)(10)(010)(10)\label{fond}
 \end{align}
 
-Contudo, por se tratarem de dados linguísticos, é imprescindível que a própria sequência fonológica também seja representada. Desse modo, os pesquisadores optam por representar, em cada vetor de input, uma sequência de três features (uma feature para cada fonema subsequente) para cada uma das dimensões propostas. Por fim, é feita uma última ressalva. Após o treinamento da rede, é necessária a criação de uma função capaz de decodificar os resultados obtidos pela camada de output. O problema se dá pois, uma vez que os vetores são introduzidos na rede, a noção de sequência se perde. Para solucionar este problema, os pesquisadores introduzem mais uma última dimensão a cada fonema, a dimensão de \textit{boundary}. Com isso, o \textit{token} de '\#' é introduzido ao início e ao fim de cada um dos verbos para "notificar" à rede de que ela está processando um item de início ou final de palavra. Desse modo, as equações \ref{token1} e \ref{token2} exibem as representações vetoriais do token de boundary e dos fonemas \textit{d} e \textit{a} considerando a última dimensão mencionada.
+Com essa tabela o sistema de codificação para um único fonema está completo, porém é imprescindível que a própria sequência fonológica também seja representada já que cada fonema constitue parte de uma sequência e os padrões devem ser encontrados levando-se em consideração essa sequência. Desse modo, os pesquisadores optam por representar, em cada vetor de \textit{input}, uma sequência de três atributos (um trigrama de atributos) para cada uma das dimensões propostas (vogal - vogal - int, por exemplo). Além disso foi acrescentada uma última dimensão para representar início ou final de palavra, representado pelo símbolo "\#". Desse modo, \ref{token1}, \ref{token2} e \ref{token3} exibem as representações vetoriais do símbolo de fronteira e dos fonemas \textit{d} e \textit{a} considerando a última dimensão mencionada.
 
 \begin{align}
 \# \Rightarrow (000)(00)(000)(00)(1)\label{token1}\\
@@ -57,7 +62,7 @@ d \Rightarrow (100)(10)(010)(10)(0)\label{token2}\\
 a \Rightarrow (001)(01)(010)(01)(0)\label{token3}
 \end{align}
 
-Por fim, cada dimensão de um fonema pode ser combinado com todas as dimensões do próximo fonema da sequência, ou seja, procura-se estudar não somente a relação entre as consoantes interrompidas e as vogais, mas também entre as consoantes interrompidas e formações fonéticas com ponto de articulação médio. Os pesquisadores definem como um \textit{Wickelfeature} cada sequência de três features fonéticas e é esta informação que serve como entrada para a rede neural responsável por detectar as irregularidades verbais.
+Por fim, define-se como um \textit{Wickelfeature} cada sequência de três atributos. Para alimentar a rede, os autores mapeiam cada verbo a um vetor booleano de tamanho 460, em que cada um destes valores representa a presença (ou ausência) de um \textit{Wickelfeature}. Em resumo, a rede completa é composta por duas camadas paralelas (\textit{input} e \textit{output} com 460 unidades de Wickelfeatures cada uma (Ver Fig. \ref{fig:esquemafdd}). 
 
 
 \begin{table}[ht!]
@@ -67,7 +72,7 @@ Por fim, cada dimensão de um fonema pode ser combinado com todas as dimensões 
 {}&\multicolumn{1}{c}     {\textbf{Anterior}}&\multicolumn{2}{c}{\textbf{Médio}}&\multicolumn{2}{c}{\textbf{Posterior}}
         \\\cmidrule(r){3-4}\cmidrule(r){5-6}\cmidrule(r){7-8}   
         &&V/L&U/S&V/L&U/S&V/L&U/S\\\midrule
-        Int.&    Stop & b & p
+        Int.&   Oclusi. & b & p
                 & d & t
                 & g & k\\
                 &Nasal & m
@@ -76,21 +81,184 @@ Por fim, cada dimensão de um fonema pode ser combinado com todas as dimensões 
                 & \\
         Cont. & Fricat. & v& f
                 & z & s
-                & j & x\\
+                & j & S\\
                 &Liq. &l
                 & &r
                 & &
-                & h\\
-        Vowel & Alta & e & i 
+                & h*\\
+        Vogal & Alta & e & i 
                 &   &  
-                & o & u\\
-              & Baixa & & E
-              & &a
+                & o & u*\\
+              & Baixa & a & E
+              & &
               & & O
         \\\bottomrule
+        Codificação: S = \ipa{S};&  j = \ipa{Z};& h\footnote{h* = Apesar de representar uma fricativa posterior, foi mantido nesta posição assim como na tabela proposta em \ref{fig:table-eng}} = x;& E = \textepsilon; & O = \textopeno & u\footnote{u* = u \& \textupsilon} & &
     \end{tabular}
     \caption{Categorização de fonemas em quatro dimensões adaptada ao Português Brasileiro}\label{tab:Tab1}
 \end{table} 
+
+
+\begin{center}
+\scalebox{0.9}{
+    \begin{tabular}{|l|cc|cc|cc|cc|cc|cc|cc|cc|cc|cc|cc|}
+%\begin{tabular}{|l|cc|}
+        \hline & 
+            \multicolumn{2}{|c|}{\footnotesize{Bilabial}} &					% Bilabial
+            \multicolumn{2}{|c|}{\footnotesize{Lab. dent.}} & 			% Labiodental
+            \multicolumn{2}{|c|}{\footnotesize{Dental}} & 					% Dental
+            \multicolumn{2}{|c|}{\footnotesize{Alveolar}} & 				% Alveolar
+            \multicolumn{2}{|c|}{\footnotesize{P-alveo.}} & 		% Post-alveolar
+            \multicolumn{2}{|c|}{\footnotesize{Retroflex}} & 				% Retroflex
+            \multicolumn{2}{|c|}{\footnotesize{Palatal}} & 					% Palatal
+            \multicolumn{2}{|c|}{\footnotesize{Velar}} & 					% Velar
+            \multicolumn{2}{|c|}{\footnotesize{Uvular}} & 					% Uvular
+            \multicolumn{2}{|c|}{\footnotesize{Pharyng.}} & 			% Pharyngeal
+            \multicolumn{2}{|c|}{\footnotesize{Glottal}}  \\					% Glottal
+
+        \hline Plosive &  							% Plosive
+            p & b &													% Bilabial
+            &&														% Labiodental
+            \multicolumn{3}{|r}{t}&							% Dental
+            \multicolumn{3}{l|}{d}&							% Alveolar
+                                                                        % Post-alveolar
+            \ipa{\:t} & \ipa{\:d}&									% Retroflex
+            c & \textbardotlessj &														% Palatal
+            k & g &													% Velar
+            q & \ipa{\;G} &										% Uvular
+            & \BlankCell        &								% Pharyngeal
+            \ipa{P}& \BlankCell         \\								% Glottal
+
+        \hline Nasal & 							% Nasal
+            & m &													% Bilabial
+            & \ipa{M} &											% Labiodental
+            \multicolumn{3}{|r}{}&								% Dental
+            \multicolumn{3}{l|}{n}&							% Alveolar
+                                                                        % Post-alveolar
+            & \ipa{\:n} &														% Retroflex
+            & \textltailn &														% Palatal
+            & \ipa{N} &														% Velar
+            & \ipa{\;N} &														% Uvular
+            \BlankCell        & \BlankCell        &		% Pharyngeal
+            \BlankCell        & \BlankCell         \\		% Glottal
+
+        \hline Trill &  								% Trill
+            & \ipa{\;B}&											% Bilabial
+            & &														% Labiodental
+            \multicolumn{3}{|r}{}&								% Dental
+            \multicolumn{3}{l|}{r}&								% Alveolar
+                                                                        % Post-alveolar
+            & &														% Retroflex
+            & &														% Palatal
+            \BlankCell        & \BlankCell        &		% Velar
+            & \ipa{\;R}&											% Uvular
+            & &														% Pharyngeal
+            \BlankCell        & \BlankCell         \\		% Glottal
+
+        \hline Tap/Flap &  						% Tap /Flap
+            & &													% Bilabial
+            & &														% Labiodental
+            \multicolumn{3}{|r}{} &					% Dental
+            \multicolumn{3}{l|}{\ipa{R}} &					% Alveolar
+                                                                        % Post-alveolar
+            & \ipa{\:r} &														% Retroflex
+            & &														% Palatal
+            \BlankCell        & \BlankCell        &		% Velar
+            & &														% Uvular
+            & &														% Pharyngeal
+            \BlankCell        & \BlankCell         \\		% Glottal
+
+        \hline Fricative & 						% Fricative
+            \ipa{F} & \ipa{B} &									% Bilabial
+            f & v &													% Labiodental
+            \ipa{T} & \ipa{D} &									% Dental
+            s & z &													% Alveolar
+            \ipa{S} & \ipa{Z} &									% Post-alveolar
+            \ipa{\:s} & \ipa{\:z} &								% Retroflex
+            \ipa{\c{c}} & \ipa{J} &								% Palatal
+            x & \ipa{G} &											% Velar
+            \ipa{X} & \ipa{K} &									% Uvular
+            \textcrh & \ipa{Q} &								% Pharyngeal
+            h & \texthth \\										% Glottal
+
+        \hline Lat. Fric. & 					% Lat. Fricative
+            \BlankCell        & \BlankCell        &		% Bilabial
+            \BlankCell        & \BlankCell        &		% Labiodental
+            \multicolumn{3}{|r}{\textbeltl} &				% Dental
+            \multicolumn{3}{l|}{\textlyoghlig} &			% Alveolar
+                                                                        % Post-alveolar
+            & &														% Retroflex
+            & &														% Palatal
+            & &														% Velar
+            & &														% Uvular
+            \BlankCell        & \BlankCell        			% Pharyngeal
+            & \BlankCell        & \BlankCell         \\   % Glottal
+
+        \hline Approx & 							% Approx.
+            & &														% Bilabial
+            & \ipa{V} &											% Labiodental
+            \multicolumn{3}{|r}{}&								% Dental
+            \multicolumn{3}{l|}{\ipa{\*r}} &					% Alveolar
+                                                                        % Post-alveolar
+            & \ipa{\:R} &											% Retroflex
+            & j &														% Palatal
+            & \textturnmrleg &									% Velar
+            & &														% Uvular
+            & &														% Pharyngeal
+            \BlankCell        & \BlankCell         \\		% Glottal
+
+        \hline Lat. appr. & 					% Lat. Approx
+            \BlankCell        & \BlankCell        &		% Bilabial
+            \BlankCell        & \BlankCell        &		% Labiodental
+            \multicolumn{3}{|r}{}&								% Dental
+            \multicolumn{3}{l|}{l}&								% Alveolar
+                                                                        % Post-alveolar
+            & \ipa{\:l} &											% Retroflex
+            & \ipa{L} &												% Palatal
+            & \ipa{\;L} &											% Velar
+            & &														% Uvular
+            \BlankCell        & \BlankCell        &		% Pharyngeal
+            \BlankCell        & \BlankCell         \\		% Glottal
+        \hline
+    \end{tabular}
+}%scalebox
+\captionof{table}{Consoantes IPA}\label{tab:ipa1}
+\end{center}
+
+\begin{center}
+    \begin{vowel}
+        %    \putcvowel[l]{i}{1}
+        \putvowel[l]{i}{0pt}{0pt}
+        \putcvowel[r]{y}{1}
+        \putcvowel[l]{e}{2}
+        \putcvowel[r]{\o}{2}
+        \putcvowel[l]{\textepsilon}{3}
+        \putcvowel[r]{\oe}{3}
+        \putcvowel[l]{a}{4}
+        \putcvowel[r]{\textscoelig}{4}
+        \putcvowel[l]{\textscripta}{5}
+        \putcvowel[r]{\textturnscripta}{5}
+        \putcvowel[l]{\textturnv}{6}
+        \putcvowel[r]{\textopeno}{6}
+        \putcvowel[l]{\textramshorns}{7}
+        \putcvowel[r]{o}{7}
+        \putcvowel[l]{\textturnm}{8}
+        \putcvowel[r]{u}{8}
+        \putcvowel[l]{\textbari}{9}
+        \putcvowel[r]{\textbaru}{9}
+        \putcvowel[l]{\textreve}{10}
+        \putcvowel[r]{\textbaro}{10}
+        \putcvowel{\textschwa}{11}
+        \putcvowel[l]{\textrevepsilon}{12}
+        \putcvowel[r]{\textcloserevepsilon}{12}
+        \putcvowel{\textsci\ \textscy}{13}
+        \putcvowel{\textupsilon}{14}
+        \putcvowel{\textturna}{15}
+        \putcvowel{\ae}{16}
+    \end{vowel}
+\captionof{table}{Vogais IPA}\label{tab:ipa2}   
+\end{center} 
+
 
 \subsection{Codificação}
 \label{sec:cod}
@@ -104,39 +272,39 @@ Cada verbo que participa da etapa de treinamento da rede passa por um processo i
 \textbf{Passo 2:} O verbo é segmentado em trigramas:\\
 \hspace*{6.0em}\#,d,a - d,a,r - a,r,\#\\
 
-\textbf{Passo 3:} Um dicionário associa cada fonema a um vetor de features fonéticas, ou seja, toda possível combinação de features foi mapeada e é representada por um índice de um dicionário (como representado na Fig. \ref{fig:fdd}).\\
+\textbf{Passo 3:} Um dicionário associa cada fonema a um vetor de features fonéticas, ou seja, toda possível combinação de features foi mapeada e associada a um índice de um dicionário. \\
 
 \textbf{Passo 4:} As features dos trigramas são combinadas produzindo \textit{Wickelfeatures}.\\
 
 %alterar a identacao aqui
 Exemplos:
 \begin{itemize}
-\item \# - int - vowel 
-\item \# - stop - low
-\item \# - middle - middle
-\item middle - middle - liq
-\item stop - low - cont
+\item \# - interrompida - vogal 
+\item \# - oclusiva - baixa
+\item \# - média - média
+\item média - média - líquida
+\item oclusiva - baixa - continuante
 \item ...
 \end{itemize}
 
 
-\textbf{Passo 5:} Um vetor-dicionário de dimensão correspondente ao número total de combinações de features possíveis é inicializado com $0's$ em todas as casas.\\
+\textbf{Passo 5:} Um dicionário de dimensão correspondente ao número total de \textit{Wickelfeatures} (460) é inicializado com $0's$ em todas as casas.\\
 
-\textbf{Passo 6:} Cada combinação de features existente no verbo analisado altera o valor do vetor-dicionário para $1$.\\
+\textbf{Passo 6:} Cada \textit{Wickelfeature} presente no verbo analisado altera o valor do dicionário para $1$.\\
 
-\textbf{Passo 7:} O vetor-dicionário atualizado é utilizado como \textit{input} para a rede.
+\textbf{Passo 7:} O dicionário resultante dos passos anteriores é utilizado como \textit{input} para a rede.
 
 \subsection{Decodificação}
 \label{sec:dec}
 
-A primeira parte da decodificação da rede envolve a seleção das unidades de Wickelfeatures que compõe o início da palavra reconstituída. Primeiramente, selecionam-se todas as unidades que tem como primeira feature o indicador de fronteira '\#'. Em seguida, dentre estas, observam-se os 16 Wickelfeatures com maior score. Isto se dá pelo número total de features combinadas possíveis para cada dimensão nas duas posições subsequentes. Feita esta seleção, os fonemas \textit{competem} pelas features, ou seja, todos os fonemas que compartilham de uma mesma feature observada somam pontos. Ao final deste processo, espera-se que o fonema com mais pontos seja o fonema alvo da decodificação. Decodificam-se portanto os primeiros dois fonemas.
+A primeira parte da decodificação da rede envolve a seleção das unidades de Wickelfeatures que compõe o início da palavra reconstituída. Primeiramente, selecionam-se todas as unidades que tem como primeiro atributo o indicador de fronteira '\#'. Em seguida, dentre estas, observam-se os Wickelfeatures com maior score. Feita esta seleção, os fonemas \textit{competem} pelas features, ou seja, todos os fonemas que compartilham de uma mesma feature observada somam pontos. Ao final deste processo, espera-se que o fonema com mais pontos seja o fonema alvo da decodificação. Decodificam-se portanto os primeiros dois fonemas.
 
-A segunda parte do processo assemelha-se à primeira, porém ao invés da busca pelo trigrama inicial, selecionam-se todas as unidades que apresentam como feature na última posição o indicador de fronteira '\#'. O processo de competição novamente para a decodificação dos dois últimos fonemas.
+A segunda parte do processo assemelha-se à primeira, porém ao invés da busca pelo trigrama inicial, selecionam-se todas as unidades que apresentam o atributo de fronteira na última posição. Em seguida ocorre o mesmo processo de competição para a decodificação dos dois últimos fonemas.
 
-A terceira parte do processo de decodificação envolve uma busca de compatibilidade entre features para os trigramas que não consitutem início ou final de palavra. Uma vez que o primeiro trigrama de fonemas foi decodificado, selecionam-se as próximas unidades cujas duas primeiras posições sejam compatíveis com as duas últimas do último trigrama decodificado. O processo de competição de fonemas se repete em um loop até que haja compatibilidade com o trigrama final, encontrado na segunda etapa.
+A terceira parte do processo de decodificação envolve uma busca de compatibilidade entre os atributos para os trigramas que não consitutem início ou final de palavra. Uma vez que o primeiro trigrama de fonemas foi decodificado, selecionam-se as próximas unidades cujas duas primeiras posições sejam compatíveis com as duas últimas do último trigrama decodificado. O processo de competição de fonemas se repete em um loop até que haja compatibilidade com o trigrama final, encontrado na segunda etapa.
 
-O maior problema desta função de decodificação encontra-se na etapa da busca pelos trigramas que não constituem início ou fim de palavra. Dependendo da sequência, é possível que dois ou mais trigramas compartilhem de muitas unidades de Wickelfeatures, ou seja, se um Wickelfeature for ativado, não há como representar sua ativação uma segunda ou terceira vez, a sua ativação acontece apenas uma vez. Isto pode interferir na etapa de seleção de compatibilidades, fazendo com que a função não consiga sair do loop pois continua selecionando os mesmos Wickelfeatures. Esse problema já foi apontado por Pinker, %tal ref.
-No livro, Pinker comenta a dificuldade da rede de Rumelhart e McClelland ao tentar decodificar a palavra 'algalgal' (Oykangand). A situação referida é de ocorrência relativamente comum na língua portuguesa já que há a ocorrência quase sistemática de revezamentos entre consoantes e vogais. Este fato constituiu um problema pois ocasionou loops na decodificação de muitos verbos. Como solução, foi necessária a implementação de uma função que considerasse apenas os trigramas fronteiriços. Desse modo foi possível verificar a capacidade da rede em capturar os processos irregulares que normalmente ocorrem no início ou final das palavras. Para a palavra "postar", por exemplo, a irregularidade ocorre ao transmutar a vogal arredondada posterior semi-fechada para semi-aberta. Como essa irregularidade já pode ser detectada na primeira etapa da decodificação, pode-se avaliar o desempenho da rede baseado nesta etapa e desconsiderar a decodificação dos trigramas intermediários 'Ost' e 'stu' sem perda de informação.  
+O maior problema desta função de decodificação encontra-se na etapa da busca pelos trigramas que não constituem início ou fim de palavra. Dependendo da sequência, é possível que dois ou mais trigramas compartilhem de muitas unidades de Wickelfeatures, ou seja, se um Wickelfeature for ativado, não há como representar sua ativação uma segunda ou terceira vez, a sua ativação acontece apenas uma vez. Isto pode interferir na etapa de seleção de compatibilidades, fazendo com que a função não consiga sair do loop pois continua selecionando os mesmos Wickelfeatures. Esse problema já foi apontado por \cite{Pinker:1999}.
+No livro, Pinker comenta a dificuldade da rede de Rumelhart e McClelland ao tentar decodificar a palavra 'algalgal' (uma palavra da língua Oykangand). Pinker faz uso desse exemplo pois, nesse caso, há inclusive a recorrência a nível de trigramas, mas o fato que é que mesmo a repetição a nível de \textit{Wickelfeatures} pode prejudicar a decodificação dos verbos. A probabilidade disso acontecer é ainda maior dependendo do comprimento dos verbos, e como apontado no Cap. \ref{ch:01-introduction}, os verbos da língua portuguesa possuem em média dois fonemas a mais que os verbos da língua inglesa. Como solução, foi necessária a implementação de uma função que considerasse apenas os trigramas fronteiriços. Desse modo foi possível verificar a capacidade da rede em capturar os processos de flexão irregulares que normalmente ocorrem no início ou no final das palavras. Para a palavra "postar", por exemplo, a irregularidade ocorre ao transmutar a vogal arredondada posterior semi-fechada para semi-aberta. Como essa irregularidade já pode ser detectada na primeira etapa da decodificação, pode-se avaliar o desempenho da rede baseado nesta etapa e desconsiderar a decodificação dos trigramas intermediários 'Ost' e 'stu' sem perda de informação.  
 
 Para concluir, a implementação de uma rede FFD para a predição de irregularidades verbais do português brasileiro mostrou-se uma tarefa de grande dificuldade e motivou a construção de novos tipos de arquitetura para o alcance dos objetivos propostos. 
 
@@ -144,9 +312,9 @@ Para concluir, a implementação de uma rede FFD para a predição de irregulari
 \section{Redes Neurais Recorrentes}
 \label{sec:RNN}
 
-A Seção \ref{sec:wickelfeatures} serve de exemplo para problematizar o uso da arquitetura FFD na modelagem dos verbos do português brasileiro. Certamente, os processos descritos nas subseções \ref{sec:cod} e \ref{sec:dec} não se apresentam como componentes simples ou orgânicos, tão pouco eficientes. O problema do processamento de dados sequenciais motivou o desenvolvimento de uma nova família de redes neurais, as Redes Neurais Recorrentes (\textit{Recurrent Neural Network - RNN}). 
+A Seção \ref{sec:wickelfeatures} serve de exemplo para problematizar o uso da arquitetura FFD na modelagem dos verbos do português brasileiro. Certamente, os processos descritos nas subseções \ref{sec:cod} e \ref{sec:dec} não se apresentam como componentes simples ou orgânicos, tão pouco eficientes. O problema do processamento de dados sequenciais motivou o desenvolvimento de uma nova família de redes neurais, as Redes Neurais Recorrentes (RNN). 
 
-A ideia central desse modelo consiste na retroalimentação dos elementos sequenciais, de modo que o \textit{input} de cada um deles serve, não somente para a previsão do próximo item da sequência, mas também para a formação de um componente intermediário, um \textit{estado}. Esses estados, representados na Figura \ref{fig:unfoldedrnn} como $\vect{h}$'s funcionam como uma espécie de memória condensada dos elementos precedentes e influenciam diretamente os estados posteriores. Essa é uma maneira de retransmitir a cada momento os efeitos dos inputs anteriores para o restante da sequência.
+A ideia central desse modelo consiste na retroalimentação dos elementos sequenciais, de modo que o \textit{input} de cada um deles serve, não somente para a previsão do próximo item da sequência, mas também para a formação de um componente intermediário, um \textit{estado}. Esses estados, representados na Figura \ref{fig:unfoldedrnn} como $\vect{h}$'s funcionam como uma espécie de memória condensada dos elementos precedentes e influenciam diretamente os estados posteriores. Essa é uma maneira de retransmitir a cada momento os efeitos dos inputs anteriores para o restante da sequência (\cite{Goodfellow-et-al-2016}).
 
 %\input{tikz/rnn-cell.tex}
 \input{tikz/rnn-unrolled.tex}
@@ -174,7 +342,7 @@ Uma LSTM continua sendo uma RNN, porém existem algumas especificidades em sua a
 %imagem de LSTM
 \input{tikz/lstm.tex}
 
-A Fig. \ref{fig:lstm} deve ser interpretada da seguinte forma: A cada novo input ($x(t)$), uma camada LSTM recebe o estado $h(t-1)$ gerado pelo input anterior assim como uma RNN comum receberia, mas recebe também o Cell State de (t-1). O Cell State traz consigo uma lista de todas as informações que ele considera que devem ser carregadas e mantidas durante todo o treinamento. Após a intervenção dos gates, o modelo pode decidir por agregar novas informações e esquecer outras nessa lista, gerando assim um novo Cell State (t). Além disso, a passagem desse input por essa camada também gera um novo estado ($h(t)$) que, além de servir como referência para o cálculo do output de (t), servirá também como referência para o próximo processamento ($x(t+1)$). %referencias
+A Fig. \ref{fig:lstm} deve ser interpretada da seguinte forma: A cada novo input ($x(t)$), uma camada LSTM recebe o estado $h(t-1)$ gerado pelo input anterior assim como uma RNN comum receberia, mas recebe também o Cell State de (t-1). O Cell State traz consigo uma lista de todas as informações que ele considera que devem ser carregadas e mantidas durante todo o treinamento. Após a intervenção dos gates, o modelo pode decidir por agregar novas informações e esquecer outras nessa lista, gerando assim um novo Cell State (t). Além disso, a passagem desse input por essa camada também gera um novo estado ($h(t)$) que, além de servir como referência para o cálculo do output de (t), servirá também como referência para o próximo processamento ($x(t+1)$). (\cite{Goodfellow-et-al-2016})
 
 \section{Encoder-Decoder}
 \label{sec:enc-dec}
@@ -187,226 +355,6 @@ Modelos do tipo Encoder-Decoder (também conhecidos como \textit{Seq2Seq}) tem s
 Em função de uma similaridade conceitual, este modelo foi escolhido, uma vez que possibilita uma interação mediada pela essência de duas qualidades de padrões sequencias e tem como objetivo a produção de um resultado orgânico, semelhante, por exemplo, a intuição de um falante nativo que advinha a conjugação da primeira pessoa do presente a partir de um verbo no infinitivo. 
 \input{tikz/seq2seq.tex}
 
-% \begin{equation}
-% \vect{o}^{(t)} = \sigma(\vect{W}_{o} \vect{h}^{(t-1)} + \vect{U}_{o} \vect{x}^{(t)} + \vect{b}_{o})
-% \end{equation}
-
-% Intuitively $\vect{f}^{(t)}$ should control how much informative will be discarded, $\vect{i}^{(t)}$ controls how much information will be updated, and $\vect{o}^{(t)}$ controls how munch each component should be outputted. A candidate cell, $\tilde{\vect{c}}^{(t)}$ is formed:
-
-% \begin{equation}
-% \tilde{\vect{c}}^{(t)} = tahn(\vect{W} \vect{h}^{(t-1)} + \vect{U} \vect{x}^{(t)} + \vect{b})
-% \end{equation}
-
-% And a new cell $\vect{c}^{(t)}$ is formed by forgetting some information of the previous cell $\tilde{\vect{c}}^{(t-1)}$ and by adding new values from $\tilde{\vect{c}}^{(t)}$ (scaled by the input gate)
-
-% \begin{equation}
-% \vect{c}^{(t)} = \vect{f}^{(t)} \odot \vect{c}^{(t-1)} + \vect{i}^{(t)} \odot \tilde{\vect{c}}^{(t)}
-% \end{equation}
-
-% The new hidden state, $\vect{h}^{(t)}$, is formed by filtering $\vect{c}^{(t)}$:
-
-% \begin{equation}
-% \vect{h}^{(t)} = \vect{o}^{(t)} \odot tanh(\vect{c}^{(t)})
-% \end{equation}
-
-% Until now we have presented general deep learning theory, now we will focus on the specificities of these models applied to natural language problems.
-
-
-% \section{Language model}
-
-% We call \textit{language model} a probability distribution over sequences of tokens in a natural language.
-
-% \[
-% P(x_1,x_2,x_3,x_4) = p
-% \]
-
-% This model is used for different NLP tasks such as speech recognition, machine translation, text auto-completion, spell correction, question answering, summarization and many others.
-
-% The classical approach to a language model was to use the chain rule of probability and a Markovian assumption, i.e., for a specific $n$ we assume that:
-
-% \begin{equation}
-% P(x_1, \dots, x_T) = \prod_{t=1}^{T} P(x_t \vert x_1, \dots, x_{t-1}) = \prod_{t=1}^{T} P(x_{t} \vert x_{t - (n+1)}, \dots, x_{t-1})
-% \end{equation} 
-
-
-% This gave raise to models based on $n$-gram statistics. The choice of $n$ yields different models; for example, the 
-% \textit{unigram} language model ($n=1$) is defined as: 
-% \begin{equation}
-% P_{uni}(x_1, x_2, x_3, x_4) = P(x_1)P(x_2)P(x_3)P(x_4)
-% \end{equation}
-
-% where $P(x_i) = count(x_i)$ and $count$ is a function that counts tokens occurrence in a corpus.\\
-
-% Similarly the \textit{bigram} language model ($n=2$) is defined as: 
-% \begin{equation}
-% P_{bi}(x_1,x_2,x_3,x_4) = P(x_1)P(x_2\vert x_1)P(x_3\vert x_2)P(x_4\vert x_3)
-% \end{equation} 
-% where
-% \begin{equation}
-% P(x_i\vert x_j) = \frac{count(x_i, x_j)}{count(x_j)}
-% \end{equation} 
-
-% With these basic statistics we can already define useful language models. It is observed that higher $n$-grams yields better performance. This comes with a price though, higher $n$-grams requires great amounts of memory \cite{Heafield}. For this motive $n$-grams based language models that are trained on large corpora uses at most $5$-grams. 
-
-% Since \cite{Mikolov11} the landscape has change, instead of using one approach that is specific for the language domain, we can use a general model for sequential data prediction, a RNN. The RNN's ability to deal with unrestricted size sequence input permits to abandon the $n$-gram model's restricted context assumption.
-
-% To understand the language model task as a machine learning task, some details should be clear. 
-
-% First, the learning task is to estimate the probability distribution 
-
-% \begin{equation}
-% \label{languagedistri}
-% P(x_{n} = \text{word}_{j^{*}} | x_{1}, \dots ,x_{n-1})
-% \end{equation}
-
-% for any $(n-1)$-sequence of words $x_{1}, \dots ,x_{n-1}$.
-
-
-% Second, the function $f$ being used to approximate \ref{languagedistri} is trained on a corpus in the following way: each word $x_t$ of the corpus will be used as input to $f$ (in the form of an one-hot vector), and the immediate subsequent word, say $x_{t+1}$, will be used as a target. The training is done by minimizing the cross entropy loss between the model's output and the probability distribution given by the target.
-
-% One example is in order. Suppose our corpus $\corpus$ is compose only by the lines below:
-
-% \begin{quote}
-% Yes, here we go again, give you more, nothing lesser\\
-% Back on the mic is the anti-depressor\\
-% Ad-Rock, the pressure, yes, we need this\\
-% The best is yet to come, and yes, believe this\\
-% \end{quote}
-
-
-% From this corpus we can construct a vocabulary list $\Vocab$ as follows: after preprocessing the text we create a list of the most frequent words (in this case we can take all words) with the size $V$ (here $V=27$). Hence, we can treat each word in the text either by an index referring to the word position on $\Vocab$ or as a one-hot vector that codifies this index (e.g., "the" would be identified with $0$, "yes" with $1$, "we" with $2$, and so on).
-
-% Then, the dataset is the collection of words 
-% \[
-% D = \{(<eos>, \text{Yes}), (\text{Yes}, \text{here}), (\text{here}, \text{we}),\dots,(\text{believe}, \text{this}), (\text{this}, <eos>)\}
-% \]
-% where $<eos>$ is the "end of sentence" token (also a member of $\Vocab$).
-
-% A simple recurrent language model $f(\vect{x}^{(t)}, \vect{\theta})$ is defined by the following equations:
-
-% \begin{equation}
-% \vect{e}^{(t)} = \vect{E}\vect{x}^{(t)}
-% \end{equation}
-% \vspace{0.2cm}
-% \begin{equation}
-% \vect{h}^{(t)} = \sigma(\vect{W}\vect{h}^{(t-1)}+ \vect{U}\vect{e}^{(t)}+ \vect{b})
-% \end{equation}
-% \vspace{0.2cm}
-% \begin{equation}
-% f(\vect{x}^{(t)}, \vect{\theta}) = \vect{\hat{y}}^{(t)} = softmax(\vect{V}\vect{h}^{(t)} + \vect{c})
-% \end{equation}
-
-% where $\vect{E} \in \mathbb{R}^{d,V}$ is the matrix of word embeddings, $\vect{x}^{(t)} \in \mathbb{R}^{V}$ is one-hot word vector at time step $t$, $\vect{y}^{(t)} \in \mathbb{R}^{V}$ is the ground truth at time step $t$ (also a one-hot word vector) and $d$ is the size of the word embeddings.
-
-% For each word $x_t$ let $j_t$ be the index of the subsequent word, so at each time $t$ the point-wise loss is:
-
-% \begin{align}
-% \label{lossCE}
-% L^{(t)}(\vect{\theta}) &= CrossEntropy(\vect{y}^{(t)},\vect{\hat{y}}^{(t)})\\
-%     &= - \log({\vect{\hat{y}}^{(t)}}_{j_t})\\
-%         &= - \log P(x_{t+1} = \text{word}_{j_t}|x_{1}, \dots, x_{t})\\
-%         &= - \log P(x_{t+1}|x_{1}, \dots, x_{t})
-% \end{align}
-
-% The loss $L$ is the mean of all point-wise losses
-
-% \begin{equation}
-% L(\vect{\theta})=\frac{1}{T}\sum_{t=1}^{T}L^{(t)}(\vect{\theta})
-% \end{equation}
-
-% With the loss function defined, we apply some optimization algorithm like \textit{stochastic gradient descent} to choose the optimal parameters for the language model:
-
-% \begin{equation}
-% \vect{\theta}^{*} = \argmin_{\vect{\theta}} L(\vect{\theta})
-% \end{equation}
-
-% Because of the historical connections with information theory, the \textit{perplexity} ($PP$) metric is often used to evaluate a language model. This metric can be thought as the weighted average branching factor of a language.
-
-% Given $\corpus = x_1, x_2, \dots, x_T$, we define the perplexity of $\corpus$ ($PP(\corpus)$) as:
-
-% \begin{align}
-% PP(\corpus) &= P(x_1, x_2, \dots, x_T)^{-\frac{1}{T}}\\
-%       &= \sqrt[T]{\frac{1}{P(x_1, x_2, \dots, x_T)}}\\
-%       &= \sqrt[T]{\prod_{i=1}^{T}\frac{1}{P(x_i \vert x_1,\dots, x_{i-1})}}
-% \end{align}
-
-% Using \ref{lossCE} we can relate cross entropy loss and perplexity:
-
-% \begin{align}
-%         L(\vect{\theta}) &=\frac{1}{T} \sum_{t=1}^{T} L^{(t)}(\vect{\theta})\\
-%           &=\frac{1}{T} \sum_{t=1}^{T} - \log P(x_{t+1}|x_{1}, \dots, x_{t})\\
-%           &=\frac{1}{T} \sum_{t=1}^{T} \log ((\frac{1}{P(x_{t+1}|x_{1}, \dots, x_{t})})\\
-%           &= \log\left( \sqrt[T]{\prod_{i=1}^{T}\frac{1}{P(x_i \vert x_1,\dots, x_{i-1})}} \right)\\
-%           &= \log(PP(\corpus))
-% \end{align}
-
-% Hence,
-
-% \begin{equation}
-% 2^{L(\vect{\theta})} = PP(\corpus)
-% \end{equation}
-
-% Thus, by finding the parameters that minimize the cross entropy error we are also minimizing the perplexity of the language model. 
-
-% \section{Sequence-to-Sequence}
-% \label{sec:Seq2seq}
-
-% There is one powerful application of RNN based language model. The authors from \cite{Sustskever} used two RNNs to create an end-to-end translation model that is now know as \textit{the encoder-decoder} or \textit{the sequence-to-sequence} (seq2seq) architecture. This architecture is define as follows: let $\vect{x}^{(1)}, \dots, \vect{x}^{(n)}$ be a source sentence in the one-hot representation,  let $\vect{y}^{(1)}, \dots, \vect{y}^{(m)}$ be the target sentence also in the one-hot format. $f_{enc}$ (the \textit{encoder}) is a RNN with the sole purpose of creating a vector representation of input language's sequences. $f_{dec}$ (the \textit{decoder}) is a language model for the target language. These models are trained together mapping source sentences to target sentences.
-
-% For example, suppose the training pair $(\vect{x}^{(1)}, \dots, \vect{x}^{(n)}, \vect{y}^{(1)}, \dots, \vect{y}^{(m)})$ is ("Nas tardes de fazenda há muito azul demais", "In the farm’s afternoons there is too much blue"). Here we want the model to translate one Portuguese sentence to an English one. We first encode the Portuguese sentence in the vector $\vect{s}$, i.e.,
-
-% \begin{equation}
-% \vect{s} = f_{enc}(\vect{x}^{(n)}, \vect{h}^{(n-1)})
-% \end{equation}
-
-% Then using the control English sentence as a target, at each time $t$ we compute the cross entropy error between the decoder prediction $f_{dec}(\vect{y}^{(t)}, \vect{\tilde{h}}^{(t-1)})$ and the target $\vect{y}^{(t+1)}$ ($\vect{y}^{(0)}$ is the $<eos>$ token). The decoder uses the vector representation of the source sentence $\vect{s}$ as an initial hidden state (i.e., $\vect{\tilde{h}}^{(0)} = \vect{s}$). The goal of this model is to to approximate the probability distribution over the tokens from the target language given the sentence of the source language, i.e.,
-
-% \begin{equation}
-% \vect{\tilde{h}}^{(t)} = f_{dec}(\vect{y}^{(t)}, \vect{\tilde{h}}^{(t-1)})
-% \end{equation}
-
-% \begin{equation}
-% \label{decpred}
-% p(y_t | y_1, \dots, y_{t-1}, x_1, \dots, x_{n}) = softmax(\vect{W}_{s}  \vect{\tilde{h}}^{(t)} + \vect{b}_s)
-% \end{equation}
-
-% One limitation of this architecture is that the source sentence, in some cases, has more features than the decoder embedding $\vect{s}$ can properly summarize. To address that some attention mechanisms were introduced.
-
-% \section{Attention}
-% \label{sec:Attention}
-
-% The attention-based models are models built on top of the seq2seq architecture. The encoding part continues the same as before, but now at each time $t$ a context vector $\vect{c}^{(t)}$ is defined to capture relevant source-side information to help the prediction of the current target word $\vect{y}^{(t)}$. Once $\vect{c}^{(t)}$ is constructed the attention hidden state is defined as:   
-
-% \begin{equation}
-% \vect{\tilde{h}}^{(t)} = tahn(\vect{W}_c[\vect{c}^{(t)};\vect{h}^{(t)}])
-% \end{equation}
-
-% With the attention hidden state defined, the model's prediction is the same as the one defined in \ref{decpred}.
-
-% The core of this technique is the definition of $\vect{c}^{(t)}$. There are different strategies available, here we will focus only on one: \textit{global attention}.
-
-% Let $\vect{a} \in \mathbb{R}^{m,n}$. We will use this matrix as an alignment matrix, i.e., at the end of the training $\vect{a}_{ts}$ should reflect the probability of the source representation $\vect{h}^{(s)}$ be relevant for the output $\hat{y}^{(t)}$. We define $\vect{a}_{ts}$ as
-
-
-% \begin{equation}
-% \vect{a}_{ts} = \frac{exp(score(\vect{\tilde{h}}_t,\vect{h}_s))}{\sum_j exp(score(\vect{\tilde{h}}_t,\vect{h}_j))}
-% \end{equation}
-
-% Where $score$ is a content-based function that can have different implementations: 
-
-% \begin{equation}
-% score(\vect{\tilde{h}}_t,\vect{h}_s) = \begin{cases}
-% \vect{\tilde{h}}_t ^{\top}\vect{h}_s\\
-% \vect{\tilde{h}}_t ^{\top}\vect{W}_a \vect{h}_s\\
-% \vect{v}_a ^{\top}tahn(\vect{W}_a[\vect{\tilde{h}}_t;\vect{h}_s])\\
-% \end{cases}
-% \end{equation}
-
-% At the end, a global context vector $\vect{c}^{(t)}$ is computed as the weighted average, according to $\vect{a}_t$ over all source states:
-
-% \begin{equation}
-% \vect{c}^{(t)} = \sum_{s} \vect{a}_{ts}\vect{h}^{(s)}
-% \end{equation}
 
 
 

@@ -8,7 +8,7 @@
 
 % operations =========
 % phon features 1
-\node[textonly] (1pho1) {[-consonantal, +consonantal]};
+\node[textonly] (1pho1) {int-vogal-int};
 
 % Legenda
 \node[textonly, above=10pt of 1pho1] (leg1) {Unidades de Input};
@@ -31,14 +31,18 @@
 \node[normal, right=45pt of x6] (y6) {};
 
 % phon features 2
-\node[textonly, right=5pt of y1] (2pho1) {[-consonantal,+consonantal]};
+\node[textonly, right=5pt of y1] (2pho1) {int-vogal-int};
 \node[textonly, above=10pt of 2pho1] (leg2) {Unidades de Output};
-\node[textonly, left=25pt of x2] (1pho2) {recuado-nasal]};
-\node[textonly, right=25pt of y2] (2pho2) {recuado-nasal]};
+\node[textonly, left=25pt of x2] (1pho2) {anterior-nasal-posterior};
+\node[textonly, right=25pt of y2] (2pho2) {anterior-nasal-posterior};
 \node[textonly, left=25pt of x3] (3pho1) {...};
 \node[textonly, right=25pt of y3] (1pho3) {...};
-\node[textonly, left=25pt of x6] (6pho1) {nasal-contínuo]};
-\node[textonly, right=25pt of y6] (1pho6) {nasal-contínuo]};
+\node[textonly, left=25pt of x4] (4pho1) {nasal-cont-ocl};
+\node[textonly, right=25pt of y4] (1pho4) {nasal-cont-ocl};
+\node[textonly, left=25pt of x5] (5pho1) {médio-cont-baixa};
+\node[textonly, right=25pt of y5] (1pho5) {médio-cont-baixa};
+\node[textonly, left=25pt of x6] (6pho1) {vogal-fric-\#};
+\node[textonly, right=25pt of y6] (1pho6) {vogal-fric-\#};
 % edges FNN
 \path[nedge] (x1) -- (y1);
 \path[nedge] (x1) -- (y2);

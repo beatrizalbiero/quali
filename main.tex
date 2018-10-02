@@ -19,6 +19,13 @@
 \usepackage{tipa}                       % para utilizar simbolos foneticos
 \usepackage{listings}                   % para formatar código-fonte (ex. em Java)
 \usepackage{titletoc}
+%\usepackage[landscape,dvips]{geometry}
+\usepackage{tabularx} 
+\usepackage{tipa}
+\let\ipa\textipa
+\usepackage{vowel}
+
+\newcommand{\BlankCell}{}
 \usepackage{lmodern}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -37,10 +44,12 @@
 \usepackage[pdftex,plainpages=false,pdfpagelabels,pagebackref,colorlinks=true,citecolor=DarkGreen,linkcolor=NavyBlue,urlcolor=DarkRed,filecolor=green,bookmarksopen=true]{hyperref} % links coloridos
 \usepackage[all]{hypcap}                    % soluciona o problema com o hyperref e capitulos
 \usepackage[round,sort,nonamebreak]{natbib} % citação bibliográfica textual(plainnat-ime.bst)
+%\setcitestyle{numbers}
 \usepackage{pgfplots}
 \usepackage{hyperref}
 \fontsize{60}{62}\usefont{OT1}{cmr}{m}{n}
 {\selectfont}
+\nocite{*}
 
 % ---------------------------------------------------------------------------- %
 % Cabeçalhos similares ao TAOCP de Donald E. Knuth
@@ -205,19 +214,24 @@ framexrightmargin=10pt
 
 % ---------------------------------------------------------------------------- %
 % Abstract
-\chapter*{Resumo}
-\noindent Albiero, B. \textbf{Um Estudo Sobre as Irregularidades Verbais do Português Brasileiro Via Redes Neurais Artificiais}. 
-2018.
-Projeto de Pesquisa (MSc) - Faculdade de Filosofia e Ciências Humanas,
-Universidade de São Paulo, São Paulo, 2018.
-\\
-\\
+% \chapter*{Resumo}
+% \noindent Albiero, B. \textbf{Um Estudo Sobre as Irregularidades Verbais do Português Brasileiro Via Redes Neurais Artificiais}. 
+% 2018.
+% Projeto de Pesquisa (MSc) - Faculdade de Filosofia e Ciências Humanas,
+% Universidade de São Paulo, São Paulo, 2018.
+% \\
+% \\
 
 
-Inspirado no experimento conexionista de Rumelhart e McClelland de 1986, este projeto tem como principal objetivo um estudo sobre as irregularidades verbais do português brasileiro através de técnicas experimentais em aprendizado de máquina, em particular, redes neurais. Neste trabalho, busca-se desenvolver o aprendizado da conjugação de verbos para a primeira pessoa do singular no tempo presente do modo indicativo utilizando como referência a forma infinitiva dos mesmos. A escolha desta conjugação específica se dá pelo alto número de irregularidades presentes, fato que dificulta inclusive o processo de aprendizado infantil. Desde a apresentação do problema na década de 80, foram realizados múltiplos avanços tecnológicos e metodológicos que impulsionaram o desenvolvimento e o saber a respeito das técnicas de modelagem em redes neurais. Particularmente, uma técnica conhecida como “encoder-decoder” se destaca dentro do escopo linguístico mostrando-se relevante em múltiplas tarefas, como por exemplo no desenvolvimento de sistemas de diálogo e sistemas de tradução automática. É por esta razão que tal técnica foi utilizada como uma das principais ferramentas para a realização dos objetivos propostos. Para tal, é necessária a realização de uma busca pelos melhores hiperparâmetros bem como as melhores arquiteturas que possibilitem o aprendizado. Múltiplos experimentos serão então estudados e comparados com relação a diferentes métricas, mas principalmente com relação à acurácia. Por fim, espera-se comparar o desempenho do melhor modelo desenvolvido na tarefa de conjugação de pseudo-verbos com a intuição linguística de falantes na mesma tarefa.
-\\
+% Esta pesquisa foi inspirada no experimento de Rumelhart e McClelland de 1986 \cite{rumelhart:1986} em que uma nova teoria em aquisição de linguagem se constituiu a partir da formulação de uma rede neural artifical capaz de aprender padrões fonéticos entre famílias de verbos irregulares da língua inglesa. Neste trabalho, exploram-se as particularidades da modelagem em redes neurais para o aprendizado de padrões fonéticos entre verbos irregulares do Português Brasileiro. Além disso, apresentam-se resultados de experimentos realizados com o uso da arquitetura Encoder-Decoder.  
 
-\noindent \textbf{Keywords:} Language Acquisition, Neural Networks, Connectionism, Natural Language Processing.
+
+% exploram-se as dificuldades  tem como principal objetivo um estudo sobre as irregularidades verbais do português brasileiro através de técnicas experimentais em aprendizado de máquina, em particular, redes neurais. Neste trabalho, busca-se desenvolver o aprendizado da conjugação de verbos para a primeira pessoa do singular no tempo presente do modo indicativo utilizando como referência a forma infinitiva dos mesmos. A escolha desta conjugação específica ocorre devido ao alto número de irregularidades presentes, fato que dificulta inclusive o processo de aprendizado infantil. 
+
+% Desde a apresentação do problema na década de 80, foram realizados múltiplos avanços tecnológicos e metodológicos que impulsionaram o desenvolvimento e o saber a respeito das técnicas de modelagem em redes neurais. Particularmente, uma técnica conhecida como “encoder-decoder” se destaca dentro do escopo linguístico mostrando-se relevante em múltiplas tarefas, como por exemplo no desenvolvimento de sistemas de diálogo e sistemas de tradução automática. É por esta razão que tal técnica foi utilizada como uma das principais ferramentas para a realização dos objetivos propostos. Para tal, é necessária a realização de uma busca pelos melhores hiperparâmetros bem como as melhores arquiteturas que possibilitem o aprendizado. Múltiplos experimentos serão então estudados e comparados com relação a diferentes métricas, mas principalmente com relação à acurácia. Por fim, espera-se comparar o desempenho do melhor modelo desenvolvido na tarefa de conjugação de pseudo-verbos com a intuição linguística de falantes na mesma tarefa.
+% \\
+
+% \noindent \textbf{Keywords:} Language Acquisition, Neural Networks, Connectionism, Natural Language Processing.
 
 % ---------------------------------------------------------------------------- %
 % Sumário
@@ -256,8 +270,8 @@ Inspirado no experimento conexionista de Rumelhart e McClelland de 1986, este pr
 \part{Próximos Passos}
 \input{ch06-future}
 
-\part{Apêndice}
-\input{ch07-appendice}
+% \part{Apêndice}
+% \input{ch07-appendice}
 
 % % cabeçalho para os apêndices
 % \renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\appendixname\ \thechapter}} {\MakeUppercase{#1}} }
